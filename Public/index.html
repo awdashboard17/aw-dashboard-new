@@ -1,0 +1,68 @@
+<!DOCTYPE>
+<html ng-app="myApp">
+
+<head>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.18/angular.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-google-chart/0.1.0/ng-google-chart.js"></script>
+    <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-google-chart/0.1.0/ng-google-chart.min.js"></script>
+    <script type="text/javascript" src="app.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.15/angular-ui-router.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+    <link rel="stylesheet" href="xeditable.css" >
+    <script src="xeditable.js"></script>
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <title>Active Workspace</title>
+</head>
+
+<body ng-controller="myController" ng-init="BringBack()">
+    
+    <h2 align="center">ACTIVE WORKSPACE AUTOTEST RESULTS</h2>
+    </br>
+    </br>
+    </br>
+    <table class="columns">
+       <tr>
+        <td>
+            <div style="padding-left: 100px;">Select Release
+              <select class="form-control" name="release" ng-model="selectedRequest.release" ng-options="c.awrelease for c in clients" required ng-change="updateDD(selectedRequest.release.awrelease)"></select>
+          </div>
+        </td>
+        
+        <td>
+          <div style="padding-left: 30px;">Select Build
+              <select class="form-control" id="build" ng-model="selectedRequest.build" ng-options="d.defaultLabel for d in selectedRequest.release.awbuild" ng-change="refreshgraph(selectedRequest.release.awrelease ,selectedRequest.build.defaultLabel)"></select>
+          </div>
+        </td>
+      </tr>
+    </table>
+    </br>
+    </br>
+    <table class="columns">
+      <tr>
+        <td><div google-chart chart="myChart1" ng-hide="ggone" ng-model="chart1build" agc-on-select="hideSeries(chart1build)" style="width: 400px; height: 400px;"></div></td>
+        <td><div google-chart chart="myChart2" ng-hide="ggtwo" ng-model="chart2build" agc-on-select="hideSeries(chart2build)" style="width: 400px; height: 400px;"></div></td>
+        <td><div google-chart chart="myChart3" ng-hide="ggthree" ng-model="chart3build" agc-on-select="hideSeries(chart3build)" style="width: 400px; height: 400px;"></div></td>
+      </tr>
+    </table>
+    <table class="columns">
+      <tr>
+        <td><div google-chart chart="myChart4" ng-hide="ggfour" ng-model="chart4build" agc-on-select="hideSeries(chart4build)" style="width: 400px; height: 400px;"></div></td>
+        <td><div google-chart chart="myChart5" ng-hide="ggfive" ng-model="chart5build" agc-on-select="hideSeries(chart5build)" style="width: 400px; height: 400px;"></div></td>		
+        <td><div google-chart chart="myChart6" ng-hide="ggsix" ng-model="chart6build" agc-on-select="hideSeries(chart6build)" style="width: 400px; height: 400px;"></div></td>
+		<td></td>		
+      </tr>
+    <table class="columns">
+      <tr>
+        <td><div google-chart chart="myChart7" ng-hide="ggseven" ng-model="chart7build" agc-on-select="hideSeries(chart7build)" style="width: 400px; height: 400px; "></div></td>
+		<td></td>		
+      </tr>
+      
+    </table>
+
+</body>
+</html>
+

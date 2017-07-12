@@ -1,0 +1,34 @@
+{[
+	{"tag":"occmgmt4gd",
+	 "Team":"4G Foundation in AW",
+	 "Director":"Nikhil Kelkar",
+	 "Scrum Master": "Jayesh Kotak",
+	 "Owner": "Jayesh Kotak"
+	}	
+	{"tag":"aw4gbom",
+	 "Team":"4GBOM in AW",
+	 "Director":"Nikhil Kelkar",
+	 "Scrum Master": "Laxmidhar Dalvi",
+	 "Owner": "Laxmidhar Dalvi"
+	}	
+	{"tag":"ace",
+	 "Team":"Active Content Experience",
+	 "Director":"Nikhil Kelkar",
+	 "Scrum Master": "Madhav Choudhary",
+	 "Owner": "Madhav Choudhary"
+	}	
+	{"tag":"socialcollab",
+	 "Team":"Active Collaboration",
+	 "Director":"Andy Mitchel",
+	 "Scrum Master": "Dave Scholly",
+	 "Owner": "Dave Scholly"
+	}
+	{"tag":"socialcollab",
+	 "Team":"Active Collaboration",
+	 "Director":"Andy Mitchel",
+	 "Scrum Master": "Dave Scholly",
+	 "Owner": "Dave Scholly"
+	}	
+		
+
+]}
