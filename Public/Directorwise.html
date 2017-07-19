@@ -43,11 +43,14 @@
     </table>
     <div google-chart chart="BuildwisechartObject" style="height:600px; width:100%;"></div>
 
-    <button ng-click="exportData()">Export as Excel</button>
-
-    <!--<form name="upload_excel">
-                Single Image with validations
+    
+  <div class="import-export-div">
+    <button class="export-excel-button"  ng-click="exportData()">Export as Excel</button>
+    <div class="upload-excel-forms" >
+      <form  name="upload_excel">
+        <span style="display:block;margin-left:5px;">Upload Excel sheet</span>      
             <input 
+            class="upload-input"
                type="file" 
                ngf-select 
                ng-model="file" 
@@ -55,21 +58,15 @@
                
                />
             
-            <button type="submit" ng-click="uploadExcel()">submit</button>
+    <button class="upload-excel-button" type="submit" ng-click="uploadExcel()">Upload</button>
             <p>{{progress}}
         </form>
+    </div>
 
-    <br />
-	<br />-->
+  </div>
+<br/>
+<br/>
 
-  <!--<form id        =  "uploadForm"
-     enctype   =  "multipart/form-data"
-     action    =  "uploadExcel"
-     method    =  "post"
-> 
-<input type="file" name="file" />Upload
-<input type="submit" value="Upload" name="submit">
-</form> -->
     
     <div id="exportable" >
       <table class="table table-bordered table-striped">

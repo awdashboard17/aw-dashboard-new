@@ -2,8 +2,9 @@
 <html ng-app="myApp">
 
 <head>
-    <script src="app.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="app.js"></script>
+    <script src="controllers/TrendsController.js"></script>
     <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.18/angular.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-google-chart/0.1.0/ng-google-chart.js"></script>
     <script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/angular-google-chart/0.1.0/ng-google-chart.min.js"></script>
@@ -17,7 +18,17 @@
     <link rel="stylesheet" href="xeditable.css" >
     <script src="xeditable.js"></script>
     <link rel="shortcut icon" href="/favicon.ico" />
+    <script  type="text/javascript" src="./controllers/MyController.js"></script>
     <title>Active Workspace</title>
+    <script>
+function appendText() {
+    var txt1 = "<p>Text.</p>";              // Create text with HTML
+    var txt2 = $("<p></p>").text("Text.");  // Create text with jQuery
+    var txt3 = document.createElement("p");
+    txt3.innerHTML = "Text.";               // Create text with DOM
+    $("body").append(txt1, txt2, txt3);     // Append new elements
+}
+</script>
 </head>
 
 <body ng-controller="myController" ng-init="BringBack()">
@@ -41,10 +52,27 @@
     </table>
     </br>
     </br>
-    <div ng-app="myApp" ng-controller="myController" ng-init="">
-        <div ng-include="'myCharts.html'"></div>
+    <div id="log">
     </div>
 
 </body>
 </html>
 
+
+
+
+
+
+<!DOCTYPE html>
+<html>
+<head>
+
+
+</head>
+<body>
+
+<p>This is a paragraph.</p>
+<button onclick="appendText()">Append text</button>
+
+</body>
+</html>

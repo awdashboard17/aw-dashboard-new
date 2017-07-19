@@ -15,6 +15,25 @@ myApp.controller('AppCtrl', ['$scope', '$http','$window', function ($scope, $htt
 
     refresh();
 
+    $scope.UpdateTeamMappings = function()
+    {
+      var username = window.prompt("Enter your username","");
+      var password = window.prompt("Enter your password","");
+      if ( username == "vikrant" && password == "vikrant")
+      {
+          alert ("Login successfully");
+          var path = "/UpdateTeamMappings.html";
+      }
+      else
+      {
+          alert("Invalid username or password");
+          var path = "/ShowTeamMappings.html";
+      }
+
+      window.location.href = path;   
+      
+    };
+
     $scope.addRecord = function ()
     {
       console.log($scope.teams);

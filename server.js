@@ -5,12 +5,153 @@ var database= require('./config/database.js')
 var db      = mongojs(database.testDbUrl);
 var trendb  = mongojs(database.trendsDbUrl);
 var bodyParser = require('body-parser');
+var multer= require('multer');
+var fs = require('fs');
+var xlstojson = require("xls-to-json-lc");
+var xlsxtojson = require("xlsx-to-json-lc");
+
+var xlsx = require('xlsx');
+var groupArray = require('group-array');
+var data_length;
 
 ObjectId    = require('mongodb').ObjectID;
 
 app.use(express.static(__dirname + '/Public'));
 app.use(bodyParser.json());
 
+app.use(function(req, res, next) { //allow cross origin requests
+        res.setHeader("Access-Control-Allow-Methods", "POST, PUT, OPTIONS, DELETE, GET");
+        res.header("Access-Control-Allow-Origin", "http://localhost");
+        res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+        next();
+    });
+
+var storage = multer.diskStorage({ //multers disk storage settings
+        destination: function (req, file, cb) {
+            cb(null, './uploads/')
+        },
+        filename: function (req, file, cb) {
+            var datetimestamp = Date.now();
+            cb(null, file.fieldname + '_' + datetimestamp + '.' + file.originalname.split('.')[file.originalname.split('.').length -1])
+        }
+    });
+
+var upload = multer({ //multer settings
+                    storage: storage,
+					fileFilter : function(req, file, callback) { //file filter
+                        if (['xls', 'xlsx'].indexOf(file.originalname.split('.')[file.originalname.split('.').length-1]) === -1) {
+                            return callback(new Error('Wrong extension type'));
+                        }
+                        callback(null, true);
+                    }
+                }).single('file');
+
+
+var findAndModify = function(collectionId,buildId, defectsArray){
+        
+		
+		return new Promise(function(resolve, reject){
+
+       defectsArray.forEach(function(element) {
+           console.log("Element up for update")
+           db.collection(collectionId).update(
+               { 
+			"results": 
+		 	{ 
+		 		$elemMatch: 
+		     	{ 
+		            "build_id": buildId,
+		            
+		            "result"  : "failed",
+		            "Scenario": element.scenario,
+                    "Feature": element.feature,
+					"Application":element.application
+		        } 
+		   	} 
+		},
+	    {
+	        $set: {
+                'results.$.defid' : element["defect id"],
+                'results.$.comment':element.comment
+         }
+	    },
+	    function(err, docs)
+	    {
+	    	if (err) reject(Error(err));
+			else
+			resolve(docs);
+	    }
+           )
+       }, this);
+		});
+       
+
+    }
+
+/** API path that will upload the files */
+app.post('/uploadExcel/:collectionId', function(req, res) {
+		var collectionId = req.params.collectionId;
+        upload(req,res,function(err){
+            if(err){
+                 res.json({error_code:1,err_desc:err});
+                 return;
+            }
+			
+			if(req.file.originalname.split('.')[req.file.originalname.split('.').length-1] === 'xlsx'){
+                exceltojson = xlsxtojson;
+            } else {
+                exceltojson = xlstojson;
+            }
+			
+			try {
+
+				exceltojson({
+					
+                    input: req.file.path,
+                     output: null,     //  './uploads/result.json'
+                    lowerCaseHeaders:true
+                }, function(err,result){
+					 var hit_count = 0;
+					
+					 var data = groupArray(result,'build');
+					 data_length = Object.keys(data).length;
+					
+					 for(var build_id in data){
+						  console.log("The data_length is : ",data_length)
+                        findAndModify(collectionId,build_id, data[build_id].filter(result => (result.comment != 'empty' || result['defect id'] != 'empty')))
+						.then(function(result){					
+
+							
+							hit_count=hit_count+1;
+							
+
+							if(hit_count == data_length){
+								res.json({error_code:0,err_desc:null, data:[]});
+								res.send();
+							}
+							
+						}, function(error){
+							console.log(error);
+							res.json({error_code:-1,err_desc:"Error while updating database."});
+							res.send();
+							
+				 				
+						});
+                    }
+					
+					
+                
+                });
+
+				
+            } catch (e){
+				console.log(e);
+                 res.json({error_code:1,err_desc:"Corrupted excel file"});
+				 res.send();
+            }
+             
+        });
+    });	
 
 
 
@@ -174,6 +315,176 @@ app.get('/filldropdownAW321', function(req, res)
 		console.log(aw321builds);
 	});
 });
+
+app.get('/getAllCollections', function(req, res)
+{
+	console.log('GET request for getAllCollections');
+	awrelases=[];
+
+	db.getCollectionNames(function(err, colNames) 
+	{
+		if (err) return console.log(err);
+		colNames.forEach(function(awrelease) 
+		{
+			console.log("collection v2 : " + awrelease);
+			awrelases.push(awrelease);
+		});
+		res.send(awrelases);
+	});
+	
+});
+
+app.get('/fillbaselinesAW34', function(req, res)
+{
+	console.log('GET request for fillbaselinesAW34');
+	aw34baselines=[];
+	db.collection('AW34').find({},{ _id: 1, Details: 1}).sort({ $natural: -1 }, function(err, docs)
+	{
+
+		for( index in docs )
+		{
+			var flag=1;
+			var id = docs[index]._id;
+			var details = docs[index].Details;
+			var config = details[0].config;
+			serveros = config[0].serveros;
+			console.log("server os : " + serveros);
+			
+			if( aw34baselines.length == 0 )
+			{
+				aw34baselines.push({ defaultLabel: id});
+			}
+			else
+			{
+				for( var i =0; i< aw34baselines.length; i++)
+				{
+					 if( aw34baselines[i].defaultLabel === id )
+					 {
+					 	flag=0;
+					 	break;
+					 }
+				}
+				if( flag == 1)
+				{
+					aw34baselines.push({ defaultLabel: id});
+				}
+			}
+
+		}
+		res.send(aw34baselines)
+		console.log(aw34baselines);
+	});
+});
+
+app.get('/fillbaselinesAW331', function(req, res)
+{
+	console.log('GET request for fillbaselinesAW331');
+	aw331baselines=[];
+	db.collection('AW331').find({},{ _id: 1}).sort({ $natural: -1 }, function(err, docs)
+	{
+
+		for( index in docs )
+		{
+			var flag=1;
+			var id = docs[index]._id;
+			if( aw331baselines.length == 0 )
+			{
+				aw331baselines.push({ defaultLabel: id});
+			}
+			else
+			{
+				for( var i =0; i< aw331baselines.length; i++)
+				{
+					 if( aw331baselines[i].defaultLabel === id )
+					 {
+					 	flag=0;
+					 	break;
+					 }
+				}
+				if( flag == 1)
+				{
+					aw331baselines.push({ defaultLabel: id});
+				}
+			}
+		}
+		res.send(aw331baselines)
+		console.log(aw331baselines);
+	});
+});
+
+app.get('/fillbaselinesAW33', function(req, res)
+{
+	console.log('GET request for fillbaselinesAW33');
+	aw33baselines=[];
+	db.collection('AW33').find({},{ _id: 1}).sort({ $natural: -1 }, function(err, docs)
+	{
+
+		for( index in docs )
+		{
+			var flag=1;
+			var id = docs[index]._id;
+			if( aw33baselines.length == 0 )
+			{
+				aw33baselines.push({ defaultLabel: id});
+			}
+			else
+			{
+				for( var i =0; i< aw33baselines.length; i++)
+				{
+					 if( aw33baselines[i].defaultLabel === id )
+					 {
+					 	flag=0;
+					 	break;
+					 }
+				}
+				if( flag == 1)
+				{
+					aw33baselines.push({ defaultLabel: id});
+				}
+			}
+		}
+		res.send(aw33baselines)
+		console.log(aw33baselines);
+	});
+});
+
+app.get('/fillbaselinesAW321', function(req, res)
+{
+	console.log('GET request for fillbaselinesAW321');
+	aw321baselines=[];
+	db.collection('AW321').find({},{ _id: 1}).sort({ $natural: -1 }, function(err, docs)
+	{
+
+		for( index in docs )
+		{
+			var flag=1;
+			var id = docs[index]._id;
+			if( aw321baselines.length == 0 )
+			{
+				aw321baselines.push({ defaultLabel: id});
+			}
+			else
+			{
+				for( var i =0; i< aw321baselines.length; i++)
+				{
+					 if( aw321baselines[i].defaultLabel === id )
+					 {
+					 	flag=0;
+					 	break;
+					 }
+				}
+				if( flag == 1)
+				{
+					aw321baselines.push({ defaultLabel: id});
+				}
+			}
+		}
+		res.send(aw321baselines)
+		console.log(aw321baselines);
+	});
+});
+
+
 
 app.get('/filldropdownAW34', function(req, res)
 {

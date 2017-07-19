@@ -1,0 +1,36 @@
+<!DOCTYPE>
+<html ng-app="myApp">
+
+<head>
+    <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.18/angular.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-router/0.2.15/angular-ui-router.min.js"></script>
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="css/bootstrap.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+    <script  type="text/javascript" src="./controllers/ReportsController.js"></script>
+    <title>Active Workspace</title>
+</head>
+
+<body ng-controller="ReportsCtrl" ng-init="BringBackBaseLines()">
+    
+    <h2 align="center">ACTIVE WORKSPACE AUTOTEST RESULTS</h2>
+    </br>
+    <table class="columns">
+       <tr>
+        <td>
+            <div style="padding-left: 80px;">Select Release
+              <select class="form-control" name="release" ng-model="selectedRequest.release" ng-options="o for o in reports2"></select>
+          </div>
+        </td>
+
+
+      </tr>
+    </table>
+    </br>
+    </br>
+
+</body>
+</html>
+

@@ -1,17 +1,57 @@
-<html>
+<!DOCTYPE>
+<html ng-app="myApp">
 <head>
-<title>Javascript Login Form Validation</title>
-<!-- Include JS File Here -->
+    <!-- Latest compiled and minified CSS -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap.min.css">
+
+    <!-- Optional theme -->
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.1/css/bootstrap-theme.min.css">
+
+    <title>TEAM DETAILS</title>
 </head>
-<body ng-controller="myController">
-<div class="container">
-<form id="form_id" method="post" name="myform">
-<label>User Name :</label>
-<input type="text" name="username" id="username"/>
-<label>Password :</label>
-<input type="password" name="password" id="password"/>
-<input type="button" value="Login" id="submit" onclick="UpdateTeamMappings()"/>
-</form>
-</div>
+<body>
+  <div class="container" ng-controller="AppCtrl">
+    <h1 align="center">TEAM DETAILS</h1>
+
+    <table class="table">
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Tag</th>         
+          <th>Team</th>
+          <th>Director</th>
+          <th>ScrumMaster</th>
+          <th>Owner</th>
+          <th>&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+            <td></td>
+          <td><input class="form-control" ng-model="teams.Tag" required></td>
+          <td><input class="form-control" ng-model="teams.Team" required></td>
+          <td><input class="form-control" ng-model="teams.Director" required></td>
+          <td><input class="form-control" ng-model="teams.ScrumMaster" required></td>
+          <td><input class="form-control" ng-model="teams.Owner" required></td>
+          <td><button class="btn btn-primary" ng-click="addRecord()" >Add Details</button></td>
+          <td><button class="btn btn-info" ng-click="update()">Update</button>
+          </td>
+        </tr>
+        <tr ng-repeat="teams in awteam">
+          <td>{{$index+1}}</td>
+          <td>{{teams.Tag}}</td>
+          <td>{{teams.Team}}</td>
+          <td>{{teams.Director}}</td>
+          <td>{{teams.ScrumMaster}}</td>
+          <td>{{teams.Owner}}</td>
+          <td><button class="btn btn-danger" ng-click="remove( teams.Tag )">Remove</button></td>
+          <td><button class="btn btn-warning" ng-click="edit( teams.Tag )">Edit</button></td>
+        </tr>
+      </tbody>
+    </table>
+
+  </div>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.12/angular.min.js"></script>
+<script src="controllers/controller.js"></script>
 </body>
 </html>
