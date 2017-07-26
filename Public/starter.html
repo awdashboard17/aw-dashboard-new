@@ -32,12 +32,19 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <!-- Google Font -->
   <link rel="stylesheet"
         href="https://fonts.googleapis.com/css?family=Source+Sans+Pro:300,400,600,700,300italic,400italic,600italic">
+  <script  type="text/javascript" src="./controllers/login.js"></script>
   <script>
   function resizeIframe(obj) {
     obj.style.height = obj.contentWindow.document.body.scrollHeight + 'px';
   }
   </script>
 
+<script>
+  (function () {
+    console.log("session display value : " + sessionStorage.getItem(display));
+    document.getElementById("myAdminMenu").setAttribute.style.display=sessionStorage.getItem(display);
+})();
+</script>
 </head>
 <!--
 BODY TAG OPTIONS:
@@ -224,7 +231,7 @@ desired effect
 
       <!-- Sidebar Menu -->
       <ul class="sidebar-menu" data-widget="tree">
-        <li class="header">Browse</li>
+        <li class="header">Navigate</li>
         <!-- Optionally, you can add icons to the links -->
         <li class="active"><a href="index.html" target="iframe1"><i class="fa fa-dashboard"></i> <span>Dashboard</span></a></li>
         <li class="treeview">
@@ -238,9 +245,22 @@ desired effect
             <li><a href="report2.html" target="iframe1">report 2</a></li>
           </ul>
         </li>
-        <li><a href="ShowTeamMappings.html" target="iframe1"><i class="fa fa-steam"></i> <span>Team Mapping</span></a></li>
         <li><a href="html/fileupload.html" target="iframe1"><i class="fa fa-upload"></i> <span>Upload File</span></a></li>
-        <li><a href="contactUs.html" target="iframe1"><i class="fa fa-envelope-o" target="iframe1"></i> <span>Contact Us</span></a></li>
+        <li><a href="contactUs.html" target="iframe1"><i class="fa fa-envelope-o"></i> <span>Contact Us</span></a></li>
+        <li><a href="login.html" ng-hide="show_menu" target="iframe1"><i class="icon ion-chatbubble-working"></i><span> Administrator Login </span></a></li>
+        <li id="myAdminMenu" class="treeview" style="display:none">
+          <a href="#"><i class="fa fa-anchor"></i> <span>Admin</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="RegisterUser.html" target="iframe1"><i class="fa fa-registered"></i>Register New User</a></li>
+            <li><a href="UpdateTeamMappings.html" target="iframe1"><i class="fa fa-steam"></i>Update Team Details</a></li>
+            <li><a href="configure.html" target="iframe1"><i class="fa fa-gears"></i>Configure</a></li>
+          </ul>
+        </li>
+        
 
       </ul>
       <!-- /.sidebar-menu -->
@@ -259,7 +279,7 @@ desired effect
         | Your Page Content Here |
         -------------------------->
         
-        <iframe name="iframe1" src="index.html" frameborder="0" scrolling="yes" width="100%" height="550" onload="resizeIframe(this)" border="none">
+        <iframe name="iframe1" src="index.html" frameborder="0" scrolling="yes" width="100%" height="680" onload="resizeIframe(this)" border="none">
             <p>Your browser does not support iframes.</p>
         </iframe>
 

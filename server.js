@@ -84,7 +84,6 @@ var findAndModify = function(collectionId,buildId, defectsArray){
            )
        }, this);
 		});
-       
 
     }
 
@@ -153,7 +152,23 @@ app.post('/uploadExcel/:collectionId', function(req, res) {
         });
     });	
 
+app.get('/getthemall/:release', function(req, res)
+{
+	release = req.params.release;
+	console.log('GET request for getthemall for ' + req.params.release);
 
+	db.collection(release).find({},{ _id: 1}).sort({ $natural: -1 }).limit(1 , function(err, docs)
+	{
+		console.log(JSON.stringify(docs[0]._id));
+		var buildid = (docs[0]._id).split("_");
+		console.log("buildid : " + buildid);
+		db.collection(release).find({_id: new RegExp(buildid[0] + "_" + buildid[1])},{_id:1,'Details.Teamwise':1}).sort({ $natural: -1 },function(err,docs1)
+		{
+			res.send(docs1);
+		});
+	});
+
+});
 
 // Landing Page graph generation function ,to fetch the latest ones
 app.get('/getthemall', function(req, res)
@@ -164,7 +179,7 @@ app.get('/getthemall', function(req, res)
 	{
 		console.log(JSON.stringify(docs[0]._id));
 		var buildid = (docs[0]._id).split("_");
-		console.log(buildid);
+		console.log("buildid : " + buildid);
 		db.collection('AW34').find({_id: new RegExp(buildid[0] + "_" + buildid[1])},{_id:1,'Details.Teamwise':1}).sort({ $natural: -1 },function(err,docs1)
 		{
 			res.send(docs1);
@@ -172,6 +187,7 @@ app.get('/getthemall', function(req, res)
 	});
 
 });
+
 
 app.put('/UpdateDefIdForFailed/:id',function(req, res)
 {
@@ -316,9 +332,9 @@ app.get('/filldropdownAW321', function(req, res)
 	});
 });
 
-app.get('/getAllCollections', function(req, res)
+app.get('/getAllCollections1', function(req, res)
 {
-	console.log('GET request for getAllCollections');
+	console.log('GET request for getAllCollections1');
 	awrelases=[];
 
 	db.getCollectionNames(function(err, colNames) 
@@ -331,7 +347,88 @@ app.get('/getAllCollections', function(req, res)
 		});
 		res.send(awrelases);
 	});
-	
+});
+
+app.get('/getPrefReleases', function(req, res)
+{
+	console.log('GET request for getPrefReleases');
+	awrelases=[];
+
+	dbmap.collection('ADMINUSERS').find( { username: "admin" }, { preference: 1, _id: 0 },function(err, docs)
+	{
+		for( index in docs )
+		{
+			var prefReleasesInfo = docs[index].preference;
+			var prefRelease = prefReleasesInfo.split("_");
+			for(i=0; i<prefRelease.length; ++i)
+			{
+				console.log( "splash : " + prefRelease[i] );
+				awrelases.push(prefRelease[i]);
+			}
+		}
+		res.send(awrelases);
+	});
+});
+
+app.get('/getBuildsOf/:release', function (req, res)
+{
+    console.log('received a GET request for getBuildsOf release : ' + req.params.release);
+    var release = req.params.release;
+    //console.log(release);
+	awbaselines=[];
+	db.collection(release).find({},{ _id: 1, Details: 1}).sort({ $natural: -1 }, function(err, docs)
+	{
+		var id;
+		var bld;
+		for( index in docs )
+		{
+			var flag=1;
+			var id = (docs[index]._id).split("_");
+			var bld = id[1];
+			
+			if( awbaselines.length == 0 )
+			{
+				awbaselines.push(bld);
+			}
+			else
+			{
+				for( var i = 0; i < awbaselines.length; ++i)
+				{
+					 if( awbaselines[i] === bld )
+					 {
+					 	flag=0;
+					 	break;
+					 }
+				}
+				if( flag == 1)
+				{
+					awbaselines.push(bld);
+				}
+			}
+
+		}
+		res.send(awbaselines)
+		console.log(awbaselines);
+	});
+
+});
+
+app.get('/getAllReleases', function(req, res)
+{
+	console.log('GET request for getAllReleases');
+	awrelases=[];
+	//var data=[];
+
+	db.getCollectionNames(function(err, colNames) 
+	{
+		if (err) return console.log(err);
+		colNames.forEach(function(awrelease) 
+		{
+			console.log("collection v2 : " + awrelease);
+			awrelases.push(awrelease)
+		});
+		res.send(awrelases);
+	});
 });
 
 app.get('/fillbaselinesAW34', function(req, res)
@@ -484,8 +581,6 @@ app.get('/fillbaselinesAW321', function(req, res)
 	});
 });
 
-
-
 app.get('/filldropdownAW34', function(req, res)
 {
 	console.log('GET request for filldropdownAW34');
@@ -558,11 +653,9 @@ app.get('/filldropdownAW331', function(req, res)
 	});
 });
 
-
-
 app.get('/awteam1/:id', function (req, res)
 {
-    console.log('received a GET request'+req.params.id);
+    console.log('received a GET request awteam1 for id : ' + req.params.id);
     var buildinfo = req.params.id;
     var splash = buildinfo.split("_");
     console.log("AWTEAM1: "+splash[0]);
@@ -713,7 +806,6 @@ app.get('/directorWiseFailedResults/:id/:directorName', function(req, res)
 });
 
 
-
 app.get('/getdirectorwiseresultsforbuild/:id', function( req, res)
 {
 	console.log("GET request for getdirectorwiseresultsforbuild");
@@ -826,47 +918,6 @@ app.get('/getcucandplm/:id',function(req,res)
     });
 });
 
-//query to fetch only unique failed test cases
-/*
-db.getCollection("AW33").aggregate
-(
-          {
-	      $unwind : '$results'
-	  },
-          {
-              $match:
-	      {
-                    '_id': /0124/,
-                  'results.result':'failed'
-                  //'results.Scenario':'Add objects From Clipboard to CAEAnalysis'
-	      }
-          },
-          {
-
-              $group :
-              {
-                 "_id" :
-                {
-                    "Tags"       : "$results.tags",
-                    "Feature"    : "$results.Feature",
-                    "Scenario"   : "$results.Scenario",
-                    "Failed Step": "$results.errorstep"
-                }
-                ,
-                "ABC" :
-                {
-                    "$addToSet" :
-                    {
-                        "build_id": "$results.build_id",
-                        "comment" : "$results.defid",
-                        "defid"   : "$results.comment"
-                    }
-                }
-             }
-          }
- )
-*/
-
 
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
@@ -876,7 +927,125 @@ db.getCollection("AW33").aggregate
 
 var dbmap = mongojs(database.mapDbUrl, ['awteam']);
 
+// Requests for adminUsers
+app.get('/adminUsers', function (req, res)
+{
+    console.log('I received a GET request : adminUsers');
+    dbmap.ADMINUSERS.find(function (err, docs) {
+        console.log(docs);
+        res.json(docs);
+    });
+});
 
+app.post('/adminUsers', function (req, res)
+{
+    console.log('I received a POST request : adminUsers');
+    console.log(req.body);
+    dbmap.collection( 'ADMINUSERS' ).insert({firstname:req.body.firstname, lastname:req.body.lastname, username:req.body.username, email:req.body.email, password:req.body.password},
+    function (err, doc) {
+        res.json(doc);
+    });
+});
+
+
+app.get('/checkIfUserExists:username', function (req, res)
+{
+    console.log('I received a GET request : checkIfUserExists');
+    console.log("username : " + req.params.username);
+	var userExists = false;
+	//dbmap.collection( 'ADMINUSERS' ).people.count( { username: { $username: req.body.username } } );
+	var docs = dbmap.collection( 'ADMINUSERS' ).findOne({username:  req.params.username},
+	function (err, doc) {
+        if(!doc) 
+		{
+			console.log("userExists : false ");
+			res.send(false);
+		}
+		else
+		{
+			console.log("userExists : true ");
+			res.send(true);
+		}
+    });
+});
+
+
+app.post('/setPreferences', function (req, res)
+{
+    console.log('I received a post request for adminUsersForPref ' );
+
+	var mySelected = [];
+	mySelected = req.body;
+	console.log(mySelected);
+	//var uname = req.data.adminUser;
+	
+	console.log( 'data to UPDATE : ' + req.body );
+	var relData = '';
+	for(i=0; i<req.body.length-1; ++i)
+		relData = (relData + (req.body[i] + "_"));
+	relData = (relData + (req.body[i]));
+	console.log(relData);
+	
+	dbmap.ADMINUSERS.findAndModify
+	(
+		{
+			query:  { username: 'admin' },
+			update: { $set: { preference: relData }}
+		},
+		function (err, doc)
+		{
+			res.json(doc);
+		}
+	)
+
+});
+
+app.delete('/adminUsers/:username', function (req, res)
+{
+    console.log('I received a DELETE request with username: ' + req.params.username);
+    var uname = req.params.username;
+    console.log(uname);
+    dbmap.ADMINUSERS.remove({ "username": uname }, function (err, doc) {
+        res.json(doc);
+    });
+});
+
+app.get('/adminUsers/:username', function (req, res)
+{
+    console.log('I received a GET request with username : ' + req.params.username);
+    var uname = req.params.username;
+    console.log('uname ' + uname);
+    dbmap.ADMINUSERS.findOne({ "username": uname }, function (err, doc)
+    {
+        res.json(doc);
+    });
+});
+
+app.put('/adminUsers/:username', function (req, res)
+{
+  console.log('I received a PUT request with username : '+ req.params.username);
+  var uname = req.params.username;
+  console.log( 'username to UPDATE : ' + uname );
+  dbmap.ADMINUSERS.findAndModify
+  (
+      {
+        query:  { username: uname },
+        update: { $set: { firstname: req.body.firstname, lastname: req.body.lastname, username: req.body.username, email: req.body.email, password: req.body.password }}
+      },
+      function (err, doc)
+      {
+        res.json(doc);
+      }
+  );
+});
+
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
+// Requests for awteam
 app.get('/awteam', function (req, res)
 {
     console.log('I received a GET request');
@@ -918,7 +1087,6 @@ app.get('/awteam/:id', function (req, res)
     });
 });
 
-
 app.put('/awteam/:id', function (req, res)
 {
   console.log('I received a PUT request with ID');
@@ -946,5 +1114,5 @@ app.put('/awteam/:id', function (req, res)
 
 
 
-app.listen(3000);
+app.listen(4000);
 console.log("Server running on port 3000");

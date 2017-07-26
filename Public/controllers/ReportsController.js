@@ -8,17 +8,50 @@ myApp.controller('ReportsCtrl', ['$scope', '$http', function ($scope, $http)
       {
         console.log("In BringBackBaseLines");
 
-          $http.get('/getAllCollections').success( function ( response )
+          $http.get('/getPrefReleases').success( function ( response )
           {
             console.log("BringBackBaseLines successful");
             console.log(response);
-            $scope.reports2 = [];
-            $scope.reports2 = response;
+            $scope.awreleases = [];
+            $scope.awreleases = response;
 
-            //console.log($scope.clients[0]);
-            //$scope.selectedRequest = {};
-            //$scope.selectedRequest.release = $scope.clients[0];
+             $scope.selectedRequest = {};
+            $scope.selectedRequest.release = $scope.awreleases[0];
           });
 
       };
+
+        $scope.updateDD =function( release )
+        {
+            if( release === 'AW321')
+            {
+            console.log("This is 321");
+            $http.get('/filldropdownAW321').success( function ( response )
+            {
+                $scope.clients = 
+                [
+                    { 
+                        awrelease: "AW34", 
+                        awbuild: [{ defaultLabel: ''}]
+                    },
+                    { 
+                        awrelease: "AW331", 
+                        awbuild: [{ defaultLabel: ''}] 
+                    },				  
+                    { 
+                        awrelease: "AW33", 
+                        awbuild: [{ defaultLabel: ''}] 
+                    },				  
+                    { 
+                        awrelease: "AW321", 
+                        awbuild: response 
+                    }			  
+                ];
+
+                $scope.selectedRequest = {};
+                $scope.selectedRequest.release = $scope.clients[3];
+
+            });
+            }
+        }
 }]);

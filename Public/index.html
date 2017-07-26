@@ -20,7 +20,7 @@
     <title>Active Workspace</title>
 </head>
 
-<body ng-controller="myController" ng-init="BringBack()">
+<body ng-controller="myController" ng-init="BringBackReleases()">
     
     <h2 align="center">ACTIVE WORKSPACE AUTOTEST RESULTS</h2>
     </br>
@@ -28,13 +28,13 @@
        <tr>
         <td>
             <div style="padding-left: 100px;">Select Release
-              <select class="form-control" name="release" ng-model="selectedRequest.release" ng-options="c.awrelease for c in clients" required ng-change="updateDD(selectedRequest.release.awrelease)"></select>
+              <select class="form-control" name="release" ng-model="selectedRequest.release" ng-options="c for c in clients.awrelease" required ng-change="updateNEWDD(selectedRequest.release)"></select>
           </div>
         </td>
         
         <td>
           <div style="padding-left: 30px;">Select Build
-              <select class="form-control" id="build" ng-model="selectedRequest.build" ng-options="d.defaultLabel for d in selectedRequest.release.awbuild" ng-change="refreshgraph(selectedRequest.release.awrelease ,selectedRequest.build.defaultLabel)"></select>
+              <select class="form-control" id="build" ng-model="selectedRequest.build" ng-options="d for d in clients.awbuild" ng-change="refreshgraph(selectedRequest.release ,selectedRequest.build)"></select>
           </div>
         </td>
       </tr>

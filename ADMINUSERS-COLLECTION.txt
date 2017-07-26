@@ -1,0 +1,18 @@
+db.createCollection( "ADMINUSERS",
+   {
+      validator: { $or:
+         [
+            { firstname : { $type: "string" } },
+            { lastname : { $type: "string" } },
+            { username : { $type: "string" } },
+            { email: { $regex: /@siemens\.com$/ } },
+            { password : { $type: "string" } },
+            { preference : { $type: "string" } },            
+         ]
+      }
+   }
+)
+
+
+
+db.contacts.insert({firstname:"9923046504", lastname:"9923046504", username:"9923046504", email:"vikrant.tagunde@gmail.com", password:"Unknown"});

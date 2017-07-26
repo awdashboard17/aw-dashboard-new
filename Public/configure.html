@@ -1,0 +1,41 @@
+<html>
+
+<head>
+   <script type="text/javascript" src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.0-beta.18/angular.js"></script>
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
+    <script  type="text/javascript" src="./controllers/configure.js"></script>
+    <title>Active Workspace</title>
+</head>
+
+<body ng-app="myApp" ng-controller="ConfigureCtrl" ng-init="BringBackBaseLines()">
+    <h2 align="center">ADMIN CONFIGURATION</h2>
+<br>
+<br>
+<div class="contentbox">
+  <div class="tablecontent">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Releases : </th>
+          <th><input type="checkbox" name="" ng-model="selectAll" ng-click="checkAll()"> Select/Deselect All</th>         
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="awrelease in myReleases">
+          <td>{{awrelease}}</td>
+          <td><input type="checkbox" name="" ng-model="selected" ng-checked="exist(awrelease)" ng-click="toggleSelection(awrelease)"></td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+<button class="btn btn-info" ng-click="saveConfiguration()">Save Configuration</button>
+<span>{{configStatus}}</span>
+<div class="selectedcontent">
+    <h3>Selected Releases : </h3>
+    <p ng-repeat="selectedRelease in selected">{{selectedRelease}}</p>
+    <!-- p ng-repeat="selectedBuilds in selected.builds">{{selectedBuilds}}</p> -->
+</div>
+</body>
+
+</html>

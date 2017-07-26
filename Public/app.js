@@ -19,7 +19,7 @@ myApp.config( function( $stateProvider, $urlRouterProvider )
 
 myApp.controller('myController', ['$scope', '$http','$location','$state', function ($scope, $http, $location, $state)
   {
-      var arrayy = ['one','two','three','four','five','six','seven','eight','nine','ten'];
+      var arrayy = ['one','two','three','four','five','six','seven','eight','nine','ten','eleven','twelve','thirteen','fourteen','fifteen'];
 
       $scope.GotoBackPage = function()
       {
@@ -49,7 +49,6 @@ myApp.controller('myController', ['$scope', '$http','$location','$state', functi
         console.log(path);
         window.location.href = path;
       };      
-
 
       $scope.refreshgraph = function( release, build )
       {
@@ -158,6 +157,20 @@ myApp.controller('myController', ['$scope', '$http','$location','$state', functi
             
         });
       };
+
+
+      $scope.updateNEWDD =function( release )
+      {
+            $http.get('/getBuildsOf/' + release).success( function ( response )
+            {
+                console.log("response : " + response);
+                $scope.clients.awbuild = [];
+                $scope.clients.awbuild = response;
+                
+            });
+      };
+
+
 
       $scope.updateDD =function( release )
       {
@@ -293,10 +306,148 @@ myApp.controller('myController', ['$scope', '$http','$location','$state', functi
       };
 
 
+    $scope.BringBackReleases = function ()
+    {
+        console.log("In BringBackReleases");
+        $scope.clients = [];
+
+        $http.get('/getPrefReleases').success( function ( response )
+        {
+            console.log("BringBackReleases successful");
+            console.log("response : " + response);
+
+            $scope.clients.awrelease = [];
+            $scope.clients.awrelease = response;
+
+            $scope.selectedRequest = {};
+            $scope.selectedRequest.release = $scope.clients.awrelease[0];
+
+            console.log($scope.selectedRequest.release);
+
+            $http.get('/getBuildsOf/' + $scope.selectedRequest.release).success( function ( response )
+            {
+                console.log("response : " + response);
+                $scope.clients.awbuild = [];
+                $scope.clients.awbuild = response;
+
+                $http.get('/getthemall/' + $scope.selectedRequest.release).success(function (response1)
+                {
+                    console.log("/getthemall successfull ============= ");
+                    console.log(response1);
+                    
+                    console.log(response1.length);
+
+                    for(iter=0; iter < response1.length; ++iter)
+                    {
+                        input = response1[iter]._id;
+                        console.log("input : " + input);
+
+                        //var chart;
+                        //var myChart;
+                        //var chartbuild;
+                        
+                        //myChart = "myChart" + iter;
+                        //chartbuild = "chart" + iter + "build";
+                        //chart = "chart" + iter;
+                        
+                        //console.log("chart : " + chart);
+
+                        $http.get('/awteam1/'+ input).success(function (response)
+                        {
+                            console.log(response);
+                                        //console.log("chart : " + chart);
+                                        //console.log("myChart : " + myChart);
+                                        //console.log("chartbuild : " + chartbuild);
+
+                                        var passfail= response.split(',');
+                                        console.log( passfail[0]);
+                                        var chart = {};
+                                        chart.type = "PieChart";
+                                        chart.displayed = false;
+                                        chart.data = {
+                                                        "cols": [
+                                                                    {
+                                                                        label: "Status",
+                                                                        type: "string"
+                                                                    }, 
+                                                                    {
+                                                                        label: "Count",
+                                                                        type: "number"
+                                                                    }
+                                                                ],
+                                                        "rows": [
+                                                                    {
+                                                                        c: [
+                                                                            {
+                                                                                v: "Passed"
+                                                                            }, 
+                                                                            {
+                                                                                v: parseInt(passfail[0])
+                                                                            }
+                                                                            ]
+                                                                    }, 
+                                                                    {
+                                                                        c: [
+                                                                            {
+                                                                                v: "Failed"
+                                                                            }, 
+                                                                            {
+                                                                                v: parseInt(passfail[1])
+                                                                            }
+                                                                            ]
+                                                                    }
+                                                                ]
+                                                    };
+
+                                        chart.options = 
+                                        {
+                                            title: input,
+                                            titleTextStyle:{
+                                                            fontSize: '16',
+                                                            fontName: 'calibri',
+                                                            bold: true
+                                                        },						
+                                            legend: 'none',
+                                            is3D: true,
+                                            pieSliceText: 'value-and-percentage',
+                                            pieStartAngle: 100,
+                                            slices: {
+                                                    0: { color: 'green' },
+                                                    1: { color: 'red' }
+                                                    }
+                                        };
+                                        $scope.myChart1 = chart;
+                                        $scope.chartbuild = input;
+                                        //eval("$scope.myChart"+(iter+1)+" = "+"chart");
+                                        //eval("$scope.chart"+(iter+1)+"build = response["+iter+"]._id ");
+
+                                    });
+                                    
+                    }
+
+                });
+
+            });
+           
+        });
+
+
+
+
+    };
+
+
+
+
+
+
+
+
       //function for loading charts
       $scope.BringBack = function ()
       {
         console.log("ng-init is called for landing page");
+
           $http.get('/filldropdownAW34').success( function ( response )
           {
             $scope.clients = 

@@ -29,9 +29,7 @@ myApp.controller('AppCtrl', ['$scope', '$http','$window', function ($scope, $htt
           alert("Invalid username or password");
           var path = "/ShowTeamMappings.html";
       }
-
       window.location.href = path;   
-      
     };
 
     $scope.addRecord = function ()
@@ -78,6 +76,6 @@ myApp.controller('AppCtrl', ['$scope', '$http','$window', function ($scope, $htt
     $scope.deselect = function ()
     {
       $scope.teams = "";
-    }
+    };
 
 }]);

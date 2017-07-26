@@ -21,10 +21,15 @@
        <tr>
         <td>
             <div style="padding-left: 80px;">Select Release
-              <select class="form-control" name="release" ng-model="selectedRequest.release" ng-options="o for o in reports2"></select>
+              <select class="form-control" name="release" ng-model="selectedRequest.release" ng-options="rel for rel in awreleases"></select>
           </div>
         </td>
 
+        <td>
+          <div style="padding-left: 30px;">Select Build
+              <select class="form-control" id="build" ng-model="selectedRequest.build" ng-options="d.defaultLabel for d in selectedRequest.release.awbuild"></select>
+          </div>
+        </td>
 
       </tr>
     </table>
