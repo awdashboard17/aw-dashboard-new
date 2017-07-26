@@ -954,8 +954,8 @@ app.get('/checkIfUserExists:username', function (req, res)
     console.log("username : " + req.params.username);
 	var userExists = false;
 	//dbmap.collection( 'ADMINUSERS' ).people.count( { username: { $username: req.body.username } } );
-	var docs = dbmap.collection( 'ADMINUSERS' ).findOne({username:  req.params.username},
-	function (err, doc) {
+	var docs = dbmap.collection( 'ADMINUSERS' ).find({username:  req.params.username}).limit(1).skip(0, function(err, doc)
+	 {
         if(!doc) 
 		{
 			console.log("userExists : false ");

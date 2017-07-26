@@ -30,45 +30,42 @@ myApp.controller('RegisterCtrl', ['$scope', '$http', '$window',  function ($scop
             $scope.emailRequired = '';
             $scope.passwordRequired = '';
 
-            var proceed = true;
+            var proceed = false;
 
             if (!$scope.formInfo.firstname) {
                 $scope.firstNameRequired = 'First Name Required';
-                proceed = false;
             }
             if (!$scope.formInfo.lastname) {
                 $scope.lastNameRequired = 'Last Name Required';
-                proceed = false;
             }
             if (!$scope.formInfo.username) {
                 $scope.userNameRequired = 'User Name Required';
-                proceed = false;
             }
             if (!$scope.formInfo.email) {
                 $scope.emailRequired = 'Email Required';
-                proceed = false;
             }
             if (!$scope.formInfo.password) {
                 $scope.passwordRequired = 'Password Required';
-                proceed = false;
             }
 
-            var createUser = true;
+            // var createUser = true;
             $http.get('/checkIfUserExists' + $scope.formInfo.username).success(function (response)
             {
                 if(response == true) 
                 {
                     // user already exists. Dont proceed to add again.
-                    createUser = false;
-                    console.log("Making proceed false as user already exists");
+                    $scope.userStatus = 'User already exists';
+                    return;
                 }
-                $scope.userStatus = 'User already exists';
+                else
+                {
+                    proceed = true;
+                }
             });
 
             console.log("proceed value : " + proceed);
-            console.log("createUser value : " + createUser);
 
-            if(proceed && createUser)
+            if(proceed)
             {
                 console.log("In Proceed");
                 var userData = $scope.formInfo.firstname+"^^^"+$scope.formInfo.lastname+"^^^"+$scope.formInfo.username+"^^^"+$scope.formInfo.email+"^^^"+$scope.formInfo.password;
