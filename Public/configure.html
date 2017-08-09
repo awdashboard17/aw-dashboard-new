@@ -7,13 +7,13 @@
     <title>Active Workspace</title>
 </head>
 
-<body ng-app="myApp" ng-controller="ConfigureCtrl" ng-init="BringBackBaseLines()">
-    <h2 align="center">ADMIN CONFIGURATION</h2>
+<body ng-app="myApp" ng-controller="ConfigureCtrl" ng-init="BringBackProducts()">
 <br>
 <br>
 <div class="contentbox">
   <div class="tablecontent">
     <table class="table">
+     Select Product : <select style="width:200px" class="form-control" name="product" ng-model="selectedRequest.product" ng-options="c for c in clients.myProducts" required ng-change="getProductVersions(selectedRequest.product)"></select>
       <thead>
         <tr>
           <th>Releases : </th>
@@ -21,7 +21,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr ng-repeat="awrelease in myReleases">
+        <tr ng-repeat="awrelease in clients.myReleases">
           <td>{{awrelease}}</td>
           <td><input type="checkbox" name="" ng-model="selected" ng-checked="exist(awrelease)" ng-click="toggleSelection(awrelease)"></td>
         </tr>
@@ -32,7 +32,7 @@
 <button class="btn btn-info" ng-click="saveConfiguration()">Save Configuration</button>
 <span>{{configStatus}}</span>
 <div class="selectedcontent">
-    <h3>Selected Releases : </h3>
+    <h3>Configured Releases : </h3>
     <p ng-repeat="selectedRelease in selected">{{selectedRelease}}</p>
     <!-- p ng-repeat="selectedBuilds in selected.builds">{{selectedBuilds}}</p> -->
 </div>

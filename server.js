@@ -257,108 +257,16 @@ app.put('/UpdateCommentForFailed/:id',function(req, res)
 	)
 });
 
-
-app.get('/filldropdownAW33', function(req, res)
-{
-	console.log('GET request for filldropdownAW33');
-	aw33builds=[];
-	db.collection('AW33').find({},{ _id: 1}).sort({ $natural: -1 }, function(err, docs)
-	{
-
-		for( index in docs )
-		{
-			var flag=1;
-			var id = (docs[index]._id).split("_");
-			if( aw33builds.length == 0 )
-			{
-				aw33builds.push({ defaultLabel: id[1]});
-			}
-			else
-			{
-				for( var i =0; i< aw33builds.length; i++)
-				{
-					 if( aw33builds[i].defaultLabel === id[1] )
-					 {
-					 	flag=0;
-					 	break;
-					 }
-				}
-				if( flag ==1)
-				{
-					aw33builds.push({ defaultLabel: id[1]});
-				}
-			}
-		}
-		res.send(aw33builds)
-		console.log(aw33builds);
-	});
-});
-
-
-
-app.get('/filldropdownAW321', function(req, res)
-{
-	console.log('GET request for filldropdownAW321');
-	aw321builds=[];
-	db.collection('AW321').find({},{ _id: 1}).sort({ $natural: -1 }, function(err, docs)
-	{
-
-		for( index in docs )
-		{
-			var flag=1;
-			var id = (docs[index]._id).split("_");
-			if( aw321builds.length == 0 )
-			{
-				aw321builds.push({ defaultLabel: id[1]});
-			}
-			else
-			{
-				for( var i =0; i< aw321builds.length; i++)
-				{
-					 if( aw321builds[i].defaultLabel === id[1] )
-					 {
-					 	flag=0;
-					 	break;
-					 }
-				}
-				if( flag ==1)
-				{
-					aw321builds.push({ defaultLabel: id[1]});
-				}
-			}
-		}
-		res.send(aw321builds)
-		console.log(aw321builds);
-	});
-});
-
-app.get('/getAllCollections1', function(req, res)
-{
-	console.log('GET request for getAllCollections1');
-	awrelases=[];
-
-	db.getCollectionNames(function(err, colNames) 
-	{
-		if (err) return console.log(err);
-		colNames.forEach(function(awrelease) 
-		{
-			console.log("collection v2 : " + awrelease);
-			awrelases.push(awrelease);
-		});
-		res.send(awrelases);
-	});
-});
-
 app.get('/getPrefReleases', function(req, res)
 {
 	console.log('GET request for getPrefReleases');
 	awrelases=[];
 
-	dbmap.collection('ADMINUSERS').find( { username: "admin" }, { preference: 1, _id: 0 },function(err, docs)
+	dbmap.collection('ADMINUSERS').find( { username: "admin"}, { preference: 1, _id: 0 },function(err, docs)
 	{
 		for( index in docs )
 		{
-			var prefReleasesInfo = docs[index].preference;
+			var prefReleasesInfo = docs[index].preference.AW;
 			var prefRelease = prefReleasesInfo.split("_");
 			for(i=0; i<prefRelease.length; ++i)
 			{
@@ -369,6 +277,107 @@ app.get('/getPrefReleases', function(req, res)
 		res.send(awrelases);
 	});
 });
+
+app.get('/getPrefReleasesOfProduct/:prod', function(req, res)
+{
+	console.log('GET request for getPrefReleasesOfProduct');
+	awrelases=[];
+	var prod = req.params.prod;
+
+	dbmap.collection('ADMINUSERS').find( { username: "admin"}, { preference: 1, _id: 0 },function(err, docs)
+	{
+		for( index in docs )
+		{
+			//console.log("var prefReleasesInfo = docs["+(index)+"].preference." + prod);
+			eval("var prefReleasesInfo = docs["+(index)+"].preference." + prod);
+			console.log("prefReleasesInfo : " + prefReleasesInfo);
+
+			var prefRelease = prefReleasesInfo.split("_");
+			for(i=0; i<prefRelease.length; ++i)
+			{
+				console.log( "splash : " + prefRelease[i] );
+				awrelases.push(prefRelease[i]);
+			}
+		}
+		res.send(awrelases);
+	});
+});
+
+app.get('/getPrefReleasesOfProduct2/:pni', function(req, res)
+{
+	console.log('GET request for getPrefReleasesOfProduct');
+	awrelases=[];
+	var pni = req.params.pni;
+	splash = pni.split(":");
+	var prod = splash[0];
+	var product_index = splash[1];
+
+	dbmap.collection('ADMINUSERS').find( { username: "admin"}, { preference: 1, _id: 0 },function(err, docs)
+	{
+		for( index in docs )
+		{
+			//console.log("var prefReleasesInfo = docs["+(index)+"].preference." + prod);
+			//eval("var prefReleasesInfo = docs["+(index)+"].preference." + prod);
+			console.log("index : " + index);
+			var myline = docs[index].preference[product_index];
+			console.log(myline);
+			splash = myline.split(":");
+			myprod = splash[0];
+			console.log("myprod : " + myprod);
+			var prefReleasesInfo = splash[1];
+			console.log("prefReleasesInfo : " + prefReleasesInfo);
+			if(myprod === prod)
+			{
+				prefRelease = prefReleasesInfo.split("_");
+				for(i=0; i<prefRelease.length; ++i)
+				{
+					console.log( "splash : " + prefRelease[i] );
+					awrelases.push(prefRelease[i]);
+				}
+			}
+		}
+		res.send(awrelases);
+	});
+});
+
+
+app.get('/getAllProducts', function(req, res)
+{
+	awproducts=[];
+	console.log('GET request for getAllProducts');
+	dbmap.collection('ADMINUSERS').find( { username: "admin"}, { productnames: 1, _id: 0 },function(err, docs)
+	{
+		for( index in docs )
+		{
+			eval("var prefProductsInfo = docs["+(index)+"].productnames");
+			console.log("prefProductsInfo.length : "+prefProductsInfo.length);
+			for(i=0; i<prefProductsInfo.length; ++i)
+			{
+				console.log( "prefProduct : " + prefProductsInfo[i] );
+				awproducts.push(prefProductsInfo[i]);
+			}
+		}
+		res.send(awproducts);
+	});
+});
+
+/*
+app.get('/getAllVersionsForProduct/:product', function (req, res)
+{
+    console.log('received a GET request for getAllVersionsForProduct : ' + req.params.release);
+    var prod = req.params.product;
+    console.log("prod : " + prod);
+	awbaselines=[];
+	dbmap.collection('ADMINUSERS').find( { username: "admin"}, { products: 1, _id: 0 },function(err, docs)
+	{
+
+		
+
+
+	});
+
+});
+*/
 
 app.get('/getBuildsOf/:release', function (req, res)
 {
@@ -417,241 +426,118 @@ app.get('/getAllReleases', function(req, res)
 {
 	console.log('GET request for getAllReleases');
 	awrelases=[];
-	//var data=[];
-
 	db.getCollectionNames(function(err, colNames) 
 	{
 		if (err) return console.log(err);
 		colNames.forEach(function(awrelease) 
 		{
-			console.log("collection v2 : " + awrelease);
+			//console.log("collection : " + awrelease);
 			awrelases.push(awrelease)
 		});
 		res.send(awrelases);
 	});
 });
 
-app.get('/fillbaselinesAW34', function(req, res)
+
+app.get('/getAllProductsVersions/:prod', function(req, res)
 {
-	console.log('GET request for fillbaselinesAW34');
-	aw34baselines=[];
-	db.collection('AW34').find({},{ _id: 1, Details: 1}).sort({ $natural: -1 }, function(err, docs)
+/*	
+	var pni = req.params.pni;
+	splash = pni.split(":");
+	prod = splash[0];
+	prod_indx = splash[1];
+*/
+	prod = req.params.prod;
+	console.log('GET request for getAllProductsVersions for product : ' + prod);
+	eval("var field = \"\'products." + prod + ".versions\'\"");
+	console.log("field value : " + field);
+
+	dbmap.collection('ADMINUSERS').find( { username: "admin"}, { products: 1, field: 1, _id: 0 },function(err, docs)
 	{
-
-		for( index in docs )
-		{
-			var flag=1;
-			var id = docs[index]._id;
-			var details = docs[index].Details;
-			var config = details[0].config;
-			serveros = config[0].serveros;
-			console.log("server os : " + serveros);
-			
-			if( aw34baselines.length == 0 )
-			{
-				aw34baselines.push({ defaultLabel: id});
-			}
-			else
-			{
-				for( var i =0; i< aw34baselines.length; i++)
-				{
-					 if( aw34baselines[i].defaultLabel === id )
-					 {
-					 	flag=0;
-					 	break;
-					 }
-				}
-				if( flag == 1)
-				{
-					aw34baselines.push({ defaultLabel: id});
-				}
-			}
-
-		}
-		res.send(aw34baselines)
-		console.log(aw34baselines);
+		console.log(docs);
+    	res.send(docs);
 	});
 });
 
-app.get('/fillbaselinesAW331', function(req, res)
-{
-	console.log('GET request for fillbaselinesAW331');
-	aw331baselines=[];
-	db.collection('AW331').find({},{ _id: 1}).sort({ $natural: -1 }, function(err, docs)
-	{
 
+
+		//eval("var productVersionInfo = docs["+prod_indx+"]." + prod + ".versions");
+		//console.log("productVersionInfo length "+productVersionInfo.length);
+
+		//for( index in docs )
+		//{
+			/*
+			eval("var productVersionInfo = docs."+ prod_indx +"." + prod + ".versions");
+			console.log("productVersionInfo : " + productVersionInfo);
+			for (i=0; i<productVersionInfo.length; ++i)
+			{
+				console.log("productVersion : " + productVersionInfo[i]);
+				prodversions.push(productVersionInfo[i]);
+			}
+*/
+			//console.log("Version[" + index + "] " + docs[index]);
+
+			//prodversions.push(docs[index]);
+		//}
+
+			/*
+			//var version = productVersionInfo.split("_");
+			for(iter=0; iter<version.length; ++iter)
+			{
+				console.log("version : " + version[iter]);
+				prodversions.push(version[iter]);
+			}
+			*/
+/*
 		for( index in docs )
 		{
-			var flag=1;
-			var id = docs[index]._id;
-			if( aw331baselines.length == 0 )
+			eval("var prefProductsInfo = docs["+(index)+"].productnames");
+			console.log("prefProductsInfo.length : "+prefProductsInfo.length);
+			for(i=0; i<prefProductsInfo.length; ++i)
 			{
-				aw331baselines.push({ defaultLabel: id});
-			}
-			else
-			{
-				for( var i =0; i< aw331baselines.length; i++)
-				{
-					 if( aw331baselines[i].defaultLabel === id )
-					 {
-					 	flag=0;
-					 	break;
-					 }
-				}
-				if( flag == 1)
-				{
-					aw331baselines.push({ defaultLabel: id});
-				}
+				console.log( "prefProduct : " + prefProductsInfo[i] );
+				awproducts.push(prefProductsInfo[i]);
 			}
 		}
-		res.send(aw331baselines)
-		console.log(aw331baselines);
-	});
-});
+*/
 
-app.get('/fillbaselinesAW33', function(req, res)
+
+
+/*
+app.get('/getConcatinatedProductsVersions/:prod', function(req, res)
 {
-	console.log('GET request for fillbaselinesAW33');
-	aw33baselines=[];
-	db.collection('AW33').find({},{ _id: 1}).sort({ $natural: -1 }, function(err, docs)
+	var prod = req.params.prod;
+	console.log('GET request for getConcatinatedProductsVersions for product : ' + prod);
+	prodversions = [];
+	dbmap.collection('ADMINUSERS').find( { username: "admin"}, { prod_versions: 1, _id: 0 },function(err, docs)
 	{
-
 		for( index in docs )
 		{
-			var flag=1;
-			var id = docs[index]._id;
-			if( aw33baselines.length == 0 )
-			{
-				aw33baselines.push({ defaultLabel: id});
-			}
-			else
-			{
-				for( var i =0; i< aw33baselines.length; i++)
-				{
-					 if( aw33baselines[i].defaultLabel === id )
-					 {
-					 	flag=0;
-					 	break;
-					 }
-				}
-				if( flag == 1)
-				{
-					aw33baselines.push({ defaultLabel: id});
-				}
-			}
+			eval("var productVersionInfo = docs["+(index)+"].prod_versions." + prod);
+			console.log("productVersionInfo : " + productVersionInfo);
 		}
-		res.send(aw33baselines)
-		console.log(aw33baselines);
+		res.send(productVersionInfo);
 	});
 });
+*/
 
-app.get('/fillbaselinesAW321', function(req, res)
+/* VIKRANT NEED UPDATE HERE
+app.get('/getAllProductsAndVersions', function(req, res)
 {
-	console.log('GET request for fillbaselinesAW321');
-	aw321baselines=[];
-	db.collection('AW321').find({},{ _id: 1}).sort({ $natural: -1 }, function(err, docs)
+	var prod = req.params.prod;
+	console.log('GET request for getAllProductsAndVersions for product : ' + prod);
+	prodversions = [];
+	dbmap.collection('ADMINUSERS').find( { username: "admin"}, { prod_versions: 1, _id: 0 },function(err, docs)
 	{
-
 		for( index in docs )
 		{
-			var flag=1;
-			var id = docs[index]._id;
-			if( aw321baselines.length == 0 )
-			{
-				aw321baselines.push({ defaultLabel: id});
-			}
-			else
-			{
-				for( var i =0; i< aw321baselines.length; i++)
-				{
-					 if( aw321baselines[i].defaultLabel === id )
-					 {
-					 	flag=0;
-					 	break;
-					 }
-				}
-				if( flag == 1)
-				{
-					aw321baselines.push({ defaultLabel: id});
-				}
-			}
+			eval("var productVersionInfo = docs["+(index)+"].prod_versions." + prod);
+			console.log("productVersionInfo : " + productVersionInfo);
 		}
-		res.send(aw321baselines)
-		console.log(aw321baselines);
+		res.send(productVersionInfo);
 	});
 });
-
-app.get('/filldropdownAW34', function(req, res)
-{
-	console.log('GET request for filldropdownAW34');
-	aw34builds=[];
-	db.collection('AW34').find({},{ _id: 1}).sort({ $natural: -1 }, function(err, docs)
-	{
-
-		for( index in docs )
-		{
-			var flag=1;
-			var id = (docs[index]._id).split("_");
-			if( aw34builds.length == 0 )
-			{
-				aw34builds.push({ defaultLabel: id[1]});
-			}
-			else
-			{
-				for( var i =0; i< aw34builds.length; i++)
-				{
-					 if( aw34builds[i].defaultLabel === id[1] )
-					 {
-					 	flag=0;
-					 	break;
-					 }
-				}
-				if( flag ==1)
-				{
-					aw34builds.push({ defaultLabel: id[1]});
-				}
-			}
-		}
-		res.send(aw34builds)
-		console.log(aw34builds);
-	});
-});
-
-app.get('/filldropdownAW331', function(req, res)
-{
-	console.log('GET request for filldropdownAW331');
-	aw331builds=[];
-	db.collection('AW331').find({},{ _id: 1}).sort({ $natural: -1 }, function(err, docs)
-	{
-
-		for( index in docs )
-		{
-			var flag=1;
-			var id = (docs[index]._id).split("_");
-			if( aw331builds.length == 0 )
-			{
-				aw331builds.push({ defaultLabel: id[1]});
-			}
-			else
-			{
-				for( var i =0; i< aw331builds.length; i++)
-				{
-					 if( aw331builds[i].defaultLabel === id[1] )
-					 {
-					 	flag=0;
-					 	break;
-					 }
-				}
-				if( flag ==1)
-				{
-					aw331builds.push({ defaultLabel: id[1]});
-				}
-			}
-		}
-		res.send(aw331builds)
-		console.log(aw331builds);
-	});
-});
+*/
 
 app.get('/awteam1/:id', function (req, res)
 {
@@ -947,50 +833,84 @@ app.post('/adminUsers', function (req, res)
     });
 });
 
-
+/*
 app.get('/checkIfUserExists:username', function (req, res)
 {
     console.log('I received a GET request : checkIfUserExists');
     console.log("username : " + req.params.username);
-	var userExists = false;
+	//var userExists = false;
 	//dbmap.collection( 'ADMINUSERS' ).people.count( { username: { $username: req.body.username } } );
-	var docs = dbmap.collection( 'ADMINUSERS' ).find({username:  req.params.username}).limit(1).skip(0, function(err, doc)
-	 {
-        if(!doc) 
-		{
-			console.log("userExists : false ");
-			res.send(false);
-		}
-		else
-		{
-			console.log("userExists : true ");
-			res.send(true);
-		}
-    });
+	//var docs = dbmap.collection( 'ADMINUSERS' ).find({username:  req.params.username},
+	var docs = dbmap.collection( 'ADMINUSERS' ).find({username:  req.params.username});
+	//console.log("docs length : " + docs);
+	//console.log(docs);
+	if(docs)
+	{
+		console.log("returning true : " + docs);
+		res.send('true');
+	}		
+	else
+	{
+		console.log("returning false : " + docs);
+		res.send('false');
+	}
+	//res.send('true');
+		
 });
+*/
 
-
-app.post('/setPreferences', function (req, res)
+app.post('/setPreferences2/:pni', function (req, res)
 {
-    console.log('I received a post request for adminUsersForPref ' );
+    console.log('I received a post request for setPreferences ' );
+
+	var pni = req.params.pni;
+	var splash = pni.split(":");
+
+	var product = splash[0];
+	product_index = parseInt(splash[1]);
+
+	console.log("product : " + product);
+	//product_index = product_index + 1;
+	console.log("product_index : " + product_index);
 
 	var mySelected = [];
-	mySelected = req.body;
+	mySelected = req.body.sel;
 	console.log(mySelected);
 	//var uname = req.data.adminUser;
 	
 	console.log( 'data to UPDATE : ' + req.body );
-	var relData = '';
+	var relData;
 	for(i=0; i<req.body.length-1; ++i)
 		relData = (relData + (req.body[i] + "_"));
 	relData = (relData + (req.body[i]));
-	console.log(relData);
+	console.log("reldata : " + relData);
+
+	var mypref = product + ":" + relData;
+
+	//eval("var myrec=\'" + product + "\' : \'" + relData + "\'");
+
+	console.log("mypref : " + mypref);
+/*
+	dbmap.collection('ADMINUSERS').update(
+        { username: 'admin' },
+			{ 	$push: { 
+				preference: {
+				 mypref,
+				$position: product_index
+			},
+			function (err, doc)
+			{
+				res.json(doc);
+			}
+		}
+	})
+*/
 	
 	dbmap.ADMINUSERS.findAndModify
 	(
 		{
 			query:  { username: 'admin' },
-			update: { $set: { preference: relData }}
+			update: { $addToSet: { preference: mypref }}, 
 		},
 		function (err, doc)
 		{
@@ -998,7 +918,120 @@ app.post('/setPreferences', function (req, res)
 		}
 	)
 
+
 });
+
+
+app.post('/setPreferences/:prod', function (req, res)
+{
+    console.log('I received a post request for adminUsersForPref ' );
+
+	prod = req.params.prod;
+	
+	var mySelected = [];
+	mySelected = req.body;
+	console.log(mySelected);
+	//var uname = req.data.adminUser;
+	
+	console.log( 'data to UPDATE : ' + req.body );
+	var relData = '';
+
+	for(i=0; i<mySelected.length-1; ++i)
+	{
+		if(mySelected[i] === '')
+		{
+			continue;
+		}
+		else
+		{
+			relData = (relData + (mySelected[i]));
+			relData = (relData + "_");
+		}
+	}
+
+	if(mySelected[mySelected.length] === '')
+	{
+		relData = relData.substr(0,relData.length-1);
+	}
+	else
+	{
+		relData = (relData + (mySelected[i]));
+		//relData = (relData + "_");
+	}
+
+
+/*
+	if (req.body[0] != '')
+	{
+		relData = req.body[0] + "_";
+		for(i=1; i<req.body.length-1; ++i)
+			relData = (relData + (req.body[i] + "_"));
+		relData = (relData + (req.body[i]));
+	}
+	else 
+		relData = '';	
+
+*/
+	
+	//relData = (relData + "\'");
+	console.log("relData : " + relData);
+
+	
+	eval("var fieldToUpdate=\"preference." + prod + "\"");
+	console.log("fieldToUpdate : " + fieldToUpdate);
+
+	var obj={};
+	obj[fieldToUpdate] = relData;
+	dbmap.collection('ADMINUSERS').update(
+                        { username: 'admin' },{ $set: obj }, 
+		function (err, doc)
+		{
+			res.json(doc);
+		}
+	)
+
+
+
+/*
+	var newFieldName = prod, o;
+	db.collection('ADMINUSERS').update(
+	{  username: 'admin' },
+	{$set:(o = {}, o["preference."+newFieldName] = relData, o)}, 
+			function (err, doc)
+			{
+				console.log("err : " + err);
+				console.log(doc);
+				res.json(doc);
+			}
+	)
+*/
+/*
+	dbmap.collection('ADMINUSERS').update(
+                        { username: 'admin' },{ $set: {  } }, 
+		function (err, doc)
+		{
+			console.log("err : " + err);
+			console.log(doc);
+			res.json(doc);
+		}
+	)
+*/
+/*
+	dbmap.ADMINUSERS.findAndModify
+	(
+		{
+			query:  { username: 'admin' },
+			update: { $set: { fieldToUpdate }}, 
+		},
+		function (err, doc)
+		{
+			console.log(doc);
+			res.json(doc);
+		}
+	)
+*/
+});
+
 
 app.delete('/adminUsers/:username', function (req, res)
 {
@@ -1044,6 +1077,107 @@ app.put('/adminUsers/:username', function (req, res)
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
+
+// Requests for adminUsers
+/*
+app.get('/getAllProducts', function (req, res)
+{
+    console.log('I received a GET request : adminUsers');
+	awproducts = [];
+
+	dbmap.collection('ADMINUSERS').find( { username: "admin"}, { products: 1, _id: 0 },function(err, docs)
+	{
+		for( index in docs )
+		{
+			var productsInfo = docs[index].products;
+			for(i=0; i<productsInfo.length; ++i)
+			{
+				console.log( "awproduct : " + productsInfo[i] );
+				awproducts.push(productsInfo[i]);
+			}
+		}
+		res.send(awproducts);
+	});
+})
+*/
+
+app.post('/addProduct', function (req, res)
+{
+    console.log('I received a POST request : addNewProduct');
+	prod = req.body.productname;
+    console.log(req.body.productname);
+	console.log("--------------------------");
+
+	eval("var fieldToUpdate = {\""+ prod +"\" : {\"versions\" : [] }}");
+	console.log("fieldToUpdate : " + fieldToUpdate);
+	dbmap.collection('ADMINUSERS').update(
+                        { username: 'admin' },{ $push: { products : fieldToUpdate } }, {upsert: true}
+	)
+	dbmap.collection('ADMINUSERS').update(
+                        { username: 'admin' },{ $push: { productnames : prod },  }, {upsert: true}
+	)
+
+	var relData = '';
+	console.log("relData : " + relData);
+	
+	eval("var fieldToUpdate=\"preference." + prod + "\"");
+	console.log("fieldToUpdate : " + fieldToUpdate);
+	
+	var obj={};
+	obj[fieldToUpdate] = relData;
+	dbmap.collection('ADMINUSERS').update(
+                        { username: 'admin' },{ $set: obj }, 
+		function (err, doc)
+		{
+			res.json(doc);
+		}
+	)
+
+/*
+	var mypref = prod + ":";
+	dbmap.collection('ADMINUSERS').findAndModify
+	(
+		{
+			query:  { username: 'admin' },
+			update: { $addToSet: { preference: mypref }}, 
+		},
+		function (err, doc)
+		{
+			res.json(doc);
+		}
+	)
+*/
+});
+
+app.post('/addVersion/:prodandindx', function (req, res)
+{
+    console.log('I received a POST request : addVersion');
+	pni = req.params.prodandindx;
+	splash =  pni.split(":");
+	prod = splash[0];
+    console.log("xxxproduct : " + prod);
+	prodindx = splash[1];
+    console.log("xxxprodindx : " + prodindx);
+	ver = req.body.productversion;
+	console.log("xxxversion : " + req.body.productversion);
+
+	eval("var fieldToUpdate = {\'products."+ prodindx + "." + prod + "." + "versions\' : \"" + ver + "\"}");
+	console.log("fieldToUpdate : " + fieldToUpdate);
+
+	dbmap.collection('ADMINUSERS').update(
+                        { username: 'admin' },{ $addToSet: fieldToUpdate }, function (err, doc)
+		{
+			res.json(doc);
+		}
+	)
+
+});
+
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
+
 
 // Requests for awteam
 app.get('/awteam', function (req, res)
@@ -1112,7 +1246,5 @@ app.put('/awteam/:id', function (req, res)
 //------------------------------------------------------------------------------
 //------------------------------------------------------------------------------
 
-
-
 app.listen(4000);
-console.log("Server running on port 3000");
+console.log("Server running on port 4000");

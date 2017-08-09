@@ -37,6 +37,20 @@ myApp.controller('TrendsCtrl',['$scope', '$http','$location', function( $scope, 
     $scope.showtrends = function()
     {
         console.log("In the show Trends");
+
+/*
+        $http.get('/getPrefReleases').success( function ( response )
+        {
+            console.log("BringBackReleases successful");
+            console.log("response : " + response);
+
+            $scope.clients.awrelease = [];
+            $scope.clients.awrelease = response;
+
+            $scope.selectedRequest = {};
+            $scope.selectedRequest.release = $scope.clients.awrelease[0];
+
+*/
         var rele = 'AW33';
         $http.get('/gettrendsdata/'+ rele).success(function (response)
         {

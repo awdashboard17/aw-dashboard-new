@@ -47,38 +47,49 @@ myApp.controller('RegisterCtrl', ['$scope', '$http', '$window',  function ($scop
             if (!$scope.formInfo.password) {
                 $scope.passwordRequired = 'Password Required';
             }
-
-            // var createUser = true;
-            $http.get('/checkIfUserExists' + $scope.formInfo.username).success(function (response)
+/*
+            $http.get('/checkIfUserExists' + $scope.formInfo.username).success(function (response2)
             {
-                if(response == true) 
+*/
+            $http.get('/adminUsers/' + $scope.formInfo.username).success(function (response2)
+            {
+                //$scope.formInfo = response;
+
+                console.log("resp value : " + response2);
+
+                if(response2 === 'null')
+                {
+                    console.log("Making proceed true : ");
+                    proceed = true;
+                    console.log("proceed value : " + proceed);
+                    if(proceed)
+                    {
+                        console.log("In Proceed");
+                        var userData = $scope.formInfo.firstname+"^^^"+$scope.formInfo.lastname+"^^^"+$scope.formInfo.username+"^^^"+$scope.formInfo.email+"^^^"+$scope.formInfo.password;
+                        console.log(userData);
+
+                        $http.post('/adminUsers', $scope.formInfo).success(function (response)
+                        {
+                            console.log("Success Message: " + response);
+                            refresh();
+                            $scope.userStatus = 'User added successfully';
+                            $scope.formInfo = "";
+                        });
+                    }
+                }                
+                else //if(response2 != 'null') 
                 {
                     // user already exists. Dont proceed to add again.
+                    console.log("keeping proceed false : ");
                     $scope.userStatus = 'User already exists';
                     return;
                 }
-                else
-                {
-                    proceed = true;
-                }
+
             });
 
-            console.log("proceed value : " + proceed);
 
-            if(proceed)
-            {
-                console.log("In Proceed");
-                var userData = $scope.formInfo.firstname+"^^^"+$scope.formInfo.lastname+"^^^"+$scope.formInfo.username+"^^^"+$scope.formInfo.email+"^^^"+$scope.formInfo.password;
-                console.log(userData);
 
-                $http.post('/adminUsers', $scope.formInfo).success(function (response)
-                {
-                    console.log("Success Message: " + response);
-                    refresh();
-                    $scope.userStatus = 'User added successfully';
-                    $scope.formInfo = "";
-                });
-            }
+ 
         };
 
     $scope.remove = function (username)

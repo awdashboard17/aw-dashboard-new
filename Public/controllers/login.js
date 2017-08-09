@@ -15,15 +15,15 @@ myApp.controller('LoginCtrl', ['$scope', '$http', function ($scope, $http)
                     //document.getElementById("myAdminMenu").style.display = "block";
                     //$scope.show_menu = true;
                     $scope.status = "Welcome " + $scope.username + " !!!";
-                    sessionStorage.setItem('display', 'block');
-                    console.log("session diplay value : " + sessionStorage.getItem('display'));
+                    //return ('display:block');
                 }
                 else
                 {
                     $scope.status = "Ooops!!! Invalid Username or Password. Please try again."
+                    //return ('display:none');
                     //document.getElementById("myAdminMenu").style.display = "none";
                     //$scope.show_menu = false;
-                    sessionStorage.setItem('display', 'none');
+                    //sessionStorage.setItem('display', 'none');
                 }
             });
 
