@@ -16,3 +16,6 @@ db.createCollection( "ADMINUSERS",
 
 
 db.contacts.insert({firstname:"9923046504", lastname:"9923046504", username:"9923046504", email:"vikrant.tagunde@gmail.com", password:"Unknown"});
+
+
+

@@ -11,24 +11,24 @@
 <br>
 <div >
     <input ng-checked="true" type="radio" name="showHideExample" ng-model="showHideExample" value="multi" ng-click="addProduct(true)">Add Product
-    <input type="radio" name="showHideExample" ng-model="showHideExample" value="single" ng-click="updateVersions(true)">Add/Update Product Versions
+    <input type="radio" name="showHideExample" ng-model="showHideExample" value="single" ng-click="updateVersions(true)">Add/Remove Product Versions
 <br>
 <br>
 
 <form ng-submit="" class="form-horizontal">
   <div class="form-group" ng-show="addProductControls">
-    <label for="product" class="col-sm-2 control-label">Product Name</label>
+    <label for="product" class="col-sm-3 control-label">Product Name</label>
     <div class="col-sm-4">
       <input class="form-control" id="product" placeholder="Product Name" ng-model="formInfo.productname">
       <span ng-show="productNameRequired">{{productNameRequired}}</span>
     </div>
   </div>
   <div class="form-group" ng-show="updateProductControls">
-    <label ng-show="addSelectLabel" for="product" class="col-sm-2 control-label">Select Product : </label>
-    <select ng-show="addSelectProduct"  style="width:200px" class="form-control" name="awproduct" ng-model="selectedRequest.awproduct" ng-options="c for c in clients.awproducts" required ng-change="">Select Release</select>
+    <label ng-show="addSelectLabel" for="product" class="col-sm-3 control-label">Select Product : </label>
+    <select ng-show="addSelectProduct"  style="width:200px" class="form-control" name="awproduct" ng-model="selectedRequest.awproduct" ng-options="c for c in clients.awproducts" required ng-change="getNewProductVersions(selectedRequest.awproduct)">Select Release</select>
     <span ng-show="selProductVersionRequired">{{selProductVersionRequired}}</span>
     <br>
-    <label for="prod_version" class="col-sm-2 control-label">Product Version</label>
+    <label for="prod_version" class="col-sm-3 control-label">Product Version : </label>
     <div class="col-sm-4">
       <input class="form-control" id="prod_version" placeholder="Product Version" ng-model="formInfo.productversion">
       <span ng-show="productVersionRequired">{{productVersionRequired}}</span>
@@ -36,8 +36,8 @@
   </div>
 
   <div class="form-group">
-    <div class="col-sm-offset-2 col-sm-10">
-      <td><button class="btn btn-info" ng-click="addNewProduct()" ng-show="addProductButton">Add New Product</button>
+    <div class="col-sm-offset-3 col-sm-10">
+      <td><button class="btn btn-info" ng-click="addNewProduct()" ng-show="addProductButton">Add Product</button>
       <td><button class="btn btn-info" ng-click="addProductVersion(selectedRequest.awproduct)" ng-show="addVersionButton">Add Product Version</button>
       <td><button class="btn btn-info" ng-click="clear()">Clear</button>
         <span align="center">{{productStatus}}</span>
@@ -47,7 +47,7 @@
 
 </div>
 
-    <table class="table">
+    <table class="table" ng-show="addProductControls">
       <thead>
         <tr>
           <th>No.</th>
@@ -59,11 +59,27 @@
         <tr ng-repeat="c in clients.awproducts">
           <td>{{$index+1}}</td>
           <td>{{c}}</td>
-          <td><button class="btn btn-danger" ng-click="remove(user.username)">Remove</button></td>
-          <td><button class="btn btn-warning" ng-click="edit(user.username)">Edit</button></td>
+          <td><button class="btn btn-danger" ng-click="removeProduct(c)">Remove</button></td>
         </tr>
       </tbody>
-    </table> 
+    </table>
+
+    <table class="table" ng-show="updateProductControls">
+      <thead>
+        <tr>
+          <th>No.</th>
+          <th>Product Version</th>
+          <th>&nbsp;</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr ng-repeat="v in clients.productversions">
+          <td>{{$index+1}}</td>
+          <td>{{v}}</td>
+          <td><button class="btn btn-danger" ng-click="removeProductVersion(v)">Remove</button></td>
+        </tr>
+      </tbody>
+    </table>  
 
 </body>
 

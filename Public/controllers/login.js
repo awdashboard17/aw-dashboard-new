@@ -1,7 +1,7 @@
 
-var myApp = angular.module('myApp', []);
-myApp.controller('LoginCtrl', ['$scope', '$http', function ($scope, $http)
-  {
+    var myApp = angular.module('myApp', []);
+    myApp.controller('LoginCtrl', ['$scope', '$http', function ($scope, $http)
+    {
         console.log("In LoginCtrl");
 
         $scope.show_menu = false;
@@ -29,4 +29,4 @@ myApp.controller('LoginCtrl', ['$scope', '$http', function ($scope, $http)
 
         };
 
-}]);
+    }]);

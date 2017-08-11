@@ -1,271 +1,246 @@
-var myApp = angular.module('myApp', []);
+    var myApp = angular.module('myApp', []);
 
-myApp.controller('productCtrl', ['$scope', '$http', function ($scope, $http)
-{
-   $scope.addProductControls = true;
-   $scope.addProductButton = true;
-   $scope.awproducts = [];
-   $scope.productStatus = "";
-   $scope.clients = [];
-   productsInfo = [];
+    myApp.controller('productCtrl', ['$scope', '$http', '$window', function ($scope, $http, $window)
+    {
+    $scope.formInfo = {};
+
+    $scope.addProductControls = true;
+    $scope.addProductButton = true;
     
-   $scope.addProduct = function(param)
-   {
-        $scope.addProductControls = param;
-        $scope.addProductButton = param;
-        $scope.updateProductControls = false;
-        $scope.addVersionButton = false;
-        $scope.productStatus = "";
-        $scope.productNameRequired = '';
-        $scope.productVersionRequired = '';
-   }
-
-   $scope.updateVersions = function(param)
-   {
-        $scope.addProductControls = false;
-        $scope.updateProductControls = param;
-        $scope.addSelectLabel = param;
-        $scope.addSelectProduct = param;
-        $scope.addProductButton = false;
-        $scope.addVersionButton = param;
-        $scope.productStatus = "";
-        $scope.productNameRequired = '';
-        $scope.productVersionRequired = '';
-   }
-
-    $scope.clear = function ()
+    $scope.productStatus = "";
+    $scope.clients = [];
+    $scope.clients.awproducts = [];
+    $scope.clients.productversions = [];
+    productsInfo = [];
+    
+    $scope.addProduct = function(param)
     {
-      $scope.formInfo = "";
-      $scope.productStatus = "";
+            $scope.addProductControls = param;
+            $scope.addProductButton = param;
+            $scope.updateProductControls = false;
+            $scope.addVersionButton = false;
+            $scope.productStatus = "";
+            $scope.productNameRequired = '';
+            $scope.productVersionRequired = '';
     }
 
-    var refresh = function ()
+    $scope.updateVersions = function(param)
     {
-        console.log("&&&&&&&&&&&&&&&& IN REFRESH &&&&&&&&&&&&&&&");
-        myclients = [];
-        myclients.awproducts = [];
-        myclients.awversions = [];
-        awproducts = [];
-        var iter;
-        $http.get('/getAllProducts').success(function (response)
+            $scope.addProductControls = false;
+            $scope.updateProductControls = param;
+            $scope.addSelectLabel = param;
+            $scope.addSelectProduct = param;
+            $scope.addProductButton = false;
+            $scope.addVersionButton = param;
+            $scope.productStatus = "";
+            $scope.productNameRequired = '';
+            $scope.productVersionRequired = '';
+
+    }
+
+        $scope.clear = function ()
         {
-            console.log(" Received from database : getAllProducts : ");
-            console.log("response : " + response);
-            awproducts = response;
-
-            for(iter=0; iter<awproducts.length; ++iter)
-            {
-                console.log("awproducts[" + iter + "] : " + awproducts[iter]);
-                myclients.awproducts[iter] = awproducts[iter];
-            }
-        });
-        $scope.clients = myclients;
-    };
-
-    console.log("-------------calling refresh-------------");
-    refresh();
-
-    $scope.BringBackProducts = function ()
-    {
-        refresh();
-    }
-
-    //function to save all form elements
-    $scope.addNewProduct = function ()
-    {
-        console.log("in addNewProduct function : ");
-        console.log($scope.formInfo);
-
-        $scope.productNameRequired = '';
-        $scope.productVersionRequired = '';
-
-        if (!$scope.formInfo.productname) {
-            $scope.productNameRequired = 'Product Name Required';
+        $scope.formInfo = "";
+        $scope.productStatus = "";
         }
 
-        var productname = $scope.formInfo.productname;
-
-        $http.get('/getAllProducts').success(function (response)
+        var refresh = function ()
         {
-            console.log(" Received from database : getAllProducts : ");
-            //console.log("response : " + response);
+            console.log("&&&&&&&&&&&&&&&& IN REFRESH &&&&&&&&&&&&&&&");
+            var prodversions = [];
+            $scope.productStatus = '';
 
-            var proceed = true;
-            //console.log("initial proceed value : " + proceed)
-
-            //check if product already exists
-            for(index in response)
+            $http.get('/getAllProducts').success(function (response)
             {
-                myprod = response[index];
-                //console.log("this a Product! "+ myprod);
-                if($scope.formInfo.productname === myprod)
+                console.log(" Received from database : getAllProducts : ");
+                console.log("response : " + response);
+                //awproducts = response;
+                $scope.clients.awproducts = response;
+                $scope.selectedRequest = {};
+                $scope.selectedRequest.awproduct = $scope.clients.awproducts[0];
+                $http.get('/getAllProductsVersions/' + $scope.selectedRequest.awproduct).success(function (response)
                 {
-                    proceed = false;
-                    console.log("product already present : changing proceed value to " + proceed)
-                    break;
-                }
+                    console.log(" Received from database : getAllProductsVersions : ");
+                    console.log("response : " + response);
+                    $scope.clients.productversions = response[0].versions;
+                });
+            });
+        };
+
+        $scope.getNewProductVersions = function( product )
+        {
+            $http.get('/getAllProductsVersions/' + product).success( function ( response )
+            {
+                console.log(" Received from database : getAllProductsVersions : ");
+                console.log("response : " + response);
+                $scope.clients.productversions = response[0].versions;
+            });
+        };
+
+        $scope.BringBackProducts = function ()
+        {
+            refresh();
+        }
+
+        $scope.addNewProduct = function ()
+        {
+            console.log("in addNewProduct function : ");
+            console.log($scope.formInfo);
+
+            $scope.productNameRequired = '';
+            $scope.productVersionRequired = '';
+
+            if (!$scope.formInfo.productname) {
+                $scope.productNameRequired = 'Product Name Required';
             }
 
-            console.log("proceed value : " + proceed)
+            var productname = $scope.formInfo.productname;
 
-            //product doesnt exists. creating new one.
-            if(proceed)
+            $http.get('/getAllProducts').success(function (response)
             {
-                var prodname = $scope.formInfo.productname;
-                console.log("prodname : " + prodname);
-                console.log("$$$$$$$$$$$$$$$$$$");
+                console.log(" Received from database : getAllProducts : ");
+                //console.log("response : " + response);
 
-                $http.post('/addProduct', $scope.formInfo).success(function (response)
+                var proceed = true;
+                //console.log("initial proceed value : " + proceed)
+
+                //check if product already exists
+                for(index in response)
                 {
-                    console.log("Success Message for addProduct : " + response);
-                    refresh();
-                    $scope.productStatus = 'Product added successfully';
-
-/*
-
-                    var prefs = [];
-                    prefs.push('');
-                    console.log("************ Setting Preferences ***********");
-                    console.log("productname : " + productname);
-
-
-
-                     $http.get('/getAllProducts').success(function (response)
+                    myprod = response[index];
+                    //console.log("this a Product! "+ myprod);
+                    if($scope.formInfo.productname === myprod)
                     {
-                        console.log(" Received from database : getAllProducts : ");
-                        console.log("response : " + response);
+                        proceed = false;
+                        console.log("product already present : changing proceed value to " + proceed)
+                        $scope.productStatus = 'Product already present !!!';
+                        break;
+                    }
+                }
 
-                        for(index in response)
-                        {
-                            myprod = response[index];
-                            console.log("this a Product! "+ myprod);
-                            if(productname === myprod)
-                            {
-                                product_index = index;
-                                console.log("product_index : " + product_index);
-                                break;
-                            }
-                        }
+                console.log("proceed value : " + proceed)
 
-                        var pni = productname + ":" + (product_index);
-                        console.log("pni in addproduct %%%%% : " + pni);
-
-                        $http.post('/setPreferences/' + pni, prefs).success(function (response)
-                        {
-                            console.log("Success Message for setPreferences : " + response);
-                        });
-*/                       
-
+                //product doesnt exists. creating new one.
+                if(proceed)
+                {
+                    var prodname = $scope.formInfo.productname;
+                    $http.post('/addProduct', $scope.formInfo).success(function (response)
+                    {
+                        refresh();
+                        $scope.productStatus = 'Product added successfully';
                         $scope.formInfo = "";
                     });
-
-                //});
-            }
-
-        });
-    };
-
-    //function to add new version to a product
-    $scope.addProductVersion = function (product)
-    {
-        console.log("in addProductVersion function : ");
-
-        $scope.selProductVersionRequired = '';
-        $scope.productVersionRequired = '';
-
-        var proceed = false;
-        var myprod = '';
-        var product_index;
-
-
-        if (!product) {
-            $scope.selProductVersionRequired = 'Select Product to add version';
-        }
-        if (!$scope.formInfo.productversion) {
-            $scope.productVersionRequired = 'Product Version Required';
-        }
-
-        console.log("product : " + product);
-        console.log("version : " + $scope.formInfo.productversion);
-
-        // get the product index.
-        $http.get('/getAllProducts').success(function (response)
-        {
-            console.log(" Received from database : getAllProducts : ");
-            console.log("response : " + response);
-
-            for(index in response)
-            {
-                myprod = response[index];
-                console.log("this a Product! "+ myprod);
-                if(product === myprod)
-                {
-                    product_index = index;
-                    console.log("product_index : " + product_index);
-                    break;
                 }
+            });
+        };
+
+        //function to add new version to a product
+        $scope.addProductVersion = function (product)
+        {
+            console.log("in addProductVersion function : ");
+
+            $scope.selProductVersionRequired = '';
+            $scope.productVersionRequired = '';
+
+            var proceed = true;
+            var productversions = [];
+
+            if (!product) {
+                $scope.selProductVersionRequired = 'Select Product to add version';
+            }
+            if (!$scope.formInfo.productversion) {
+                $scope.productVersionRequired = 'Product Version Required';
             }
 
-            var pni = product + ":" + product_index;
-            console.log("pni : " + pni);
+            console.log("product : " + product);
+            console.log("version : " + $scope.formInfo.productversion);
 
-            $http.post('/addVersion/' + pni, $scope.formInfo).success(function (response)
+            // get the product index.
+            $http.get('/getAllProductsVersions/' + product).success( function ( response )
             {
-                console.log("Success Message: ");
-                refresh();
-                $scope.productStatus = 'Product added successfully';
-                $scope.formInfo = "";
+                console.log(" Received from database : getAllProductsVersions : ");
+                console.log("response : " + response[0].versions);
+
+                productversions = response[0].versions;
+
+                for(iter=0; iter < productversions.length; ++iter)
+                {
+                    console.log("product : " + product);
+                    console.log("productversions[iter] : " + productversions[iter]);
+                    if($scope.formInfo.productversion === productversions[iter])
+                    {
+                        console.log("productversion already present. making proceed to false");
+                        $scope.productStatus = 'Product version already present !!!';
+                        $scope.selectedRequest.awproduct = product;
+                        proceed = false;
+                        break;
+                    }
+                }
+
+                console.log("Adding productversion : proceed : " +  proceed);
+                if(proceed)
+                {
+                    $http.post('/addVersion/' + product, $scope.formInfo).success(function (response)
+                    {
+                        console.log("Success Message: ");
+                        $scope.productStatus = 'Product version added successfully';
+                        $scope.formInfo = "";
+                        $http.get('/getAllProductsVersions/' + product).success(function (response)
+                        {
+                            console.log(" Received from database : getAllProductsVersions : ");
+                            console.log("response : " + response);
+                            $scope.clients.productversions = response[0].versions;
+                        });
+                    });
+                }
+                    
             });
-            
-        });
 
-    };
+        };
 
-
-
-/*
-$scope.remove = function (username)
-{
-    console.log(username);
-    if(username != 'admin')
-    {
-        var deleteUser = $window.confirm('Are you sure to remove the user?');
-        if(deleteUser)
+        $scope.removeProduct = function (product)
         {
-            $http.delete('/adminUsers/' + username).success(function (response)
+            console.log("in removeProduct function : ");
+            console.log("product : " + product);
+            var deleteProduct = $window.confirm('Are you sure to remove the product?');
+            if(deleteProduct)
             {
-                refresh();
-                $scope.formInfo = "";
-                $scope.userStatus = "User removed successfully !!!";
-            });
-        }
-    }
-    else
-    {
-        $scope.userStatus = "You cannot remove \'admin\' user !!!";
-    }
-};
+                $http.delete('/delProduct/' + product).success(function (response)
+                {
+                    refresh();
+                    $scope.formInfo = "";
+                    $scope.productStatus = "Product removed successfully !!!";
+                });
+            }
+        };
 
-$scope.edit = function (username)
-{
-    console.log('username to edit ' + username);
-    document.getElementById("userName").readOnly = true;
-    $http.get('/adminUsers/' + username).success(function (response)
-    {
-    $scope.formInfo = response;
-    });
-};  
+        $scope.removeProductVersion = function (productversion)
+        {
+            console.log("in removeProductVersion function : ");
+            console.log("product : " + $scope.selectedRequest.awproduct);
+            var selectedProduct = $scope.selectedRequest.awproduct;
+            console.log("productversion : " + productversion);
 
-$scope.update = function ()
-{
-    console.log("in update function : RegisterUserjs");
-    $http.put('/adminUsers/' + $scope.formInfo.username, $scope.formInfo).success(function (response)
-    {
-    refresh();
-    $scope.formInfo = "";
-    $scope.userStatus = "User updated successfully !!!";
-    document.getElementById("userName").readOnly = true;
-    })
-};
-*/
-}]);
+            var prodandver = selectedProduct + ":" + productversion;
+            console.log("prodandver : " + prodandver);
+
+            var deleteProductVersion = $window.confirm('Are you sure to remove the product version?');
+            if(deleteProductVersion)
+            {
+                $http.delete('/delProductVersion/' + prodandver).success(function (response)
+                {
+                    //refresh();
+                    $scope.formInfo = "";
+                    $scope.productStatus = "Product version removed successfully !!!";
+                    $http.get('/getAllProductsVersions/' + selectedProduct).success(function (response)
+                    {
+                        console.log(" Received from database : getAllProductsVersions : ");
+                        console.log("response : " + response);
+                        $scope.clients.productversions = response[0].versions;
+                    });
+
+                });
+            }
+        };
+
+    }]);
