@@ -1,6 +1,6 @@
   var myApp = angular.module('myApp', []);
 
-  myApp.controller('ConfigureCtrl', ['$scope', '$http', function ($scope, $http)
+  myApp.controller('ConfigureCtrl', ['$scope', '$http', '$window', function ($scope, $http, $window)
   {
         $scope.clients = [];
         $scope.selected = [];
@@ -103,12 +103,24 @@
         {
             console.log("In Save Configuration");
             $scope.selected.sort();
-              
-            $http.post('/savePreference/' + $scope.selectedRequest.product, $scope.selected).success(function (response)
+
+            var savePref = $window.confirm('Are you sure you want to add this preference?');
+            if(savePref)  
             {
-                $scope.configStatus = "User preferences saved successfully !!!";
-            })
+              $http.post('/savePreference/' + $scope.selectedRequest.product, $scope.selected).success(function (response)
+              {
+                  console.log("User preferences saved successfully !!!");
+                  $scope.configStatus = "User preferences saved successfully !!!";
+              })
+            }
 
         };
-
+        
+        $scope.logout = function(){
+            console.log("destroying session object for user admin");
+            $window.sessionStorage.removeItem('user');
+            var path = "/login.html";
+            console.log(path);
+            window.location.href = path;
+        };
   }]);

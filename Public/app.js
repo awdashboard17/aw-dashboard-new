@@ -37,6 +37,14 @@
             window.location.href = path;
         };
 
+        $scope.logout = function(){
+            console.log("destroying session object for user admin");
+            $window.sessionStorage.removeItem('user');
+            var path = "/login.html";
+            console.log(path);
+            window.location.href = path;
+        };
+
         $scope.GotoTrends = function()
         {
             console.log("In GotoTrends button");

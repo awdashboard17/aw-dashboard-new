@@ -8,7 +8,7 @@
     <title>Active Workspace</title>
 </head>
 
-<body ng-app="myApp" ng-controller="LoginCtrl">
+<body ng-app="myApp" ng-controller="LoginCtrl" ng-init="LoadLoginPage()">
  
     <div class="col-md-12">
       <h3> Adminstrator Login :</h3>
@@ -17,10 +17,12 @@
         <div class="col-md-4">
           <div class="form-group">
             <input type="text" class="form-control" ng-model="username" placeholder="username" required=""/>
+            <span ng-show="usernameRequired">{{usernameRequired}}</span>
           </div> 
 
           <div class="form-group">
             <input type="password" class="form-control" ng-model="password" placeholder="password" required=""/>
+            <span ng-show="passwordRequired">{{passwordRequired}}</span>
           </div>
 
           <div class="form-group">

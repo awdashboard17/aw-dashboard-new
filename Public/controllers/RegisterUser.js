@@ -47,10 +47,7 @@
                 if (!$scope.formInfo.password) {
                     $scope.passwordRequired = 'Password Required';
                 }
-    /*
-                $http.get('/checkIfUserExists' + $scope.formInfo.username).success(function (response2)
-                {
-    */
+
                 $http.get('/adminUsers/' + $scope.formInfo.username).success(function (response2)
                 {
                     //$scope.formInfo = response;
@@ -72,7 +69,7 @@
                             {
                                 console.log("Success Message: " + response);
                                 refresh();
-                                $scope.userStatus = 'User added successfully';
+                                $scope.userStatus = 'User added successfully !!!';
                                 $scope.formInfo = "";
                             });
                         }
@@ -81,15 +78,12 @@
                     {
                         // user already exists. Dont proceed to add again.
                         console.log("keeping proceed false : ");
-                        $scope.userStatus = 'User already exists';
+                        $scope.userStatus = 'User already exists !!!';
                         return;
                     }
 
                 });
-
-
-
-    
+   
             };
 
         $scope.remove = function (username)
@@ -105,6 +99,9 @@
                         refresh();
                         $scope.formInfo = "";
                         $scope.userStatus = "User removed successfully !!!";
+                        $scope.formInfo = "";
+                        $scope.userStatus = "";
+                        document.getElementById("userName").readOnly = false;
                     });
                 }
             }
@@ -138,9 +135,17 @@
 
         $scope.clear = function ()
         {
-        $scope.formInfo = "";
-        $scope.userStatus = "";
-        document.getElementById("userName").readOnly = false;
+            $scope.formInfo = "";
+            $scope.userStatus = "";
+            document.getElementById("userName").readOnly = false;
         }
-
+    
+        $scope.logout = function(){
+            console.log("destroying session object for user admin");
+            $window.sessionStorage.removeItem('user');
+            var path = "/login.html";
+            console.log(path);
+            window.location.href = path;
+        };
+        
     }]);

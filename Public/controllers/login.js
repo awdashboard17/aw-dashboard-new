@@ -1,32 +1,57 @@
-
     var myApp = angular.module('myApp', []);
-    myApp.controller('LoginCtrl', ['$scope', '$http', function ($scope, $http)
+    myApp.controller('LoginCtrl', ['$scope', '$http', '$location', '$window', function ($scope, $http, $location, $window)
     {
         console.log("In LoginCtrl");
 
         $scope.show_menu = false;
         $scope.signIn = function () 
         {
-            $http.get('/adminUsers/' + $scope.username).success(function (response)
-            {
-                console.log("database password : " + response.password);
-                if(response.password === $scope.password)
-                {   console.log("Sign in successful.");
-                    //document.getElementById("myAdminMenu").style.display = "block";
-                    //$scope.show_menu = true;
-                    $scope.status = "Welcome " + $scope.username + " !!!";
-                    //return ('display:block');
-                }
-                else
-                {
-                    $scope.status = "Ooops!!! Invalid Username or Password. Please try again."
-                    //return ('display:none');
-                    //document.getElementById("myAdminMenu").style.display = "none";
-                    //$scope.show_menu = false;
-                    //sessionStorage.setItem('display', 'none');
-                }
-            });
+           $scope.usernameRequired = '';
+            $scope.passwordRequired = '';
+            var proceed = true;
 
+            if (!$scope.username) {
+                $scope.usernameRequired = 'User Name Required';
+                proceed = false;
+
+            }
+            if (!$scope.password) {
+                $scope.passwordRequired = 'Password Required';
+                proceed = false;
+            }
+
+            if(proceed)
+            {
+                $http.get('/adminUsers/' + $scope.username).success(function (response)
+                {
+                    console.log("database password : " + response.password);
+                    if(response.password === $scope.password)
+                    {   
+                        console.log("Sign in successful.");
+                        $window.sessionStorage.setItem('user',$scope.username);
+                        var path = "/configure.html";
+                        console.log(path);
+                        window.location.href = path;
+                    }
+                    else
+                    {
+                        $scope.status = "Invalid Username or Password !!!"
+                    }
+                });
+            }
+        };
+
+        $scope.LoadLoginPage = function () 
+        {
+            var username = sessionStorage.getItem('user');
+            if (username != null)
+            {
+                console.log("User already Signed in.");
+                $scope.status = "Welcome " + username + " !!!";
+                var path = "/configure.html";
+                console.log(path);
+                window.location.href = path;
+            }
         };
 
     }]);

@@ -9,6 +9,12 @@
 
 <body ng-app="myApp" ng-controller="productCtrl" ng-init="BringBackProducts()">
 <br>
+  <div style="text-align: right">
+            <a href="configure.html" target="iframe1"><i class="fa fa-gears"></i>Admin Configuration</a> | 
+            <a href="UpdateTeamMappings.html" target="iframe1"><i class="fa fa-steam"></i>Configure Teams</a> | 
+            <a href="RegisterUser.html" target="iframe1"><i class="fa fa-registered"></i>Register User</a> | 
+            <a href="" target="iframe1" ng-click="logout()"><i class="fa fa-registered"></i>Logout</a> |
+</div>
 <div >
     <input ng-checked="true" type="radio" name="showHideExample" ng-model="showHideExample" value="multi" ng-click="addProduct(true)">Add Product
     <input type="radio" name="showHideExample" ng-model="showHideExample" value="single" ng-click="updateVersions(true)">Add/Remove Product Versions

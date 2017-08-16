@@ -708,7 +708,7 @@
 
 	app.post('/savePreference/:product', function (req, res)
 	{
-		console.log('I received a post request for savePreference ' );
+		console.log('I received a post request for savePreference ****' );
 
 		product = req.params.product;
 		console.log("product : " + product);
@@ -718,12 +718,13 @@
 		console.log("mySelected : " + mySelected);
 
 		// clear old preference
+		console.log("updating preference to remove all elements");
 		dbmap.PRODUCTS.update(
 								{productname: product}, 
 								{ $set : {preference: [] }} , {multi:true} ,
 					function (err, doc)
 					{
-						console.log("updated preference to remove all elements");
+						//console.log("updated preference to remove all elements");
 					}
 		)
 
@@ -736,9 +737,9 @@
 
 		for(iter=0; iter<mySelected.length; iter++)
 		{
-			if(iter === mySelected.length)
+			console.log("Adding product version : " + mySelected[iter]);
+			if(iter === mySelected.length-1)
 			{
-				console.log("Adding product version : " + mySelected[iter]);
 				dbmap.PRODUCTS.update(
 						{ productname: product },
 						{ $addToSet: { preference : mySelected[iter] } }, {upsert: true},
@@ -750,7 +751,6 @@
 			}
 			else
 			{
-				console.log("Adding product version : " + mySelected[iter]);
 				dbmap.PRODUCTS.update(
 								{ productname: product },
 								{ $addToSet: { preference : mySelected[iter] } }, {upsert: true}

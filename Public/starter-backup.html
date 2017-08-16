@@ -239,9 +239,23 @@ desired effect
             <li><a href="report2.html" target="iframe1">report 2</a></li>
           </ul>
         </li>
-        <li><a href="login.html" ng-hide="show_menu" target="iframe1"><i class="icon ion-chatbubble-working"></i><span> Administrator Login </span></a></li>
         <li><a href="html/fileupload.html" target="iframe1"><i class="fa fa-upload"></i> <span>Upload File</span></a></li>
         <li><a href="contactUs.html" target="iframe1"><i class="fa fa-envelope-o"></i> <span>Contact Us</span></a></li>
+        <li><a href="login.html" ng-hide="show_menu" target="iframe1"><i class="icon ion-chatbubble-working"></i><span> Administrator Login </span></a></li>
+
+        <li id="myAdminMenu" class="treeview" style="display:block">
+          <a href="#"><i class="fa fa-anchor"></i> <span>Admin</span>
+            <span class="pull-right-container">
+                <i class="fa fa-angle-left pull-right"></i>
+              </span>
+          </a>
+          <ul class="treeview-menu">
+            <li><a href="product.html" target="iframe1"><i class="fa fa-gears"></i>Product Configuration</a></li>
+            <li><a href="configure.html" target="iframe1"><i class="fa fa-gears"></i>Admin Configuration</a></li>
+            <li><a href="UpdateTeamMappings.html" target="iframe1"><i class="fa fa-steam"></i>Configure Teams</a></li>
+            <li><a href="RegisterUser.html" target="iframe1"><i class="fa fa-registered"></i>Register User</a></li>
+          </ul>
+        </li>
 
       </ul>
       <!-- /.sidebar-menu -->
