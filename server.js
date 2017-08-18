@@ -842,6 +842,11 @@
 		dbmap.PRODUCTS.update(
 							{ productname: product },{ $push: { versions : productversion } }, {upsert: true}, function (err, doc)
 			{
+				//res.json(doc);
+			}
+		)
+
+		db.createCollection( productversion, 	function(err, doc)	{
 				res.json(doc);
 			}
 		)
