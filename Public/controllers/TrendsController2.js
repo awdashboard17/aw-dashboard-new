@@ -1,5 +1,5 @@
   var myApp = angular.module('myApp', ['ui.router','googlechart','xeditable']);
-  myApp.controller('TrendsCtrl',['$scope', '$http','$location', function( $scope, $http, $location )
+  myApp.controller('TrendsCtrl2',['$scope', '$http','$location', function( $scope, $http, $location )
   {
       console.log("In trends control");
       $scope.GotoBackPage = function()
@@ -73,11 +73,13 @@
                 var rele = $scope.selectedRequest.trendrelease;
                 $http.get('/gettrendsdata/'+ rele).success(function (response)
                 {
-                    console.log("Success Message: gettrendsdata ------------ "+ response);
+                    console.log("---------- Success Message: gettrendsdata ------------ "+ response);
+/*                    
                     for(index in response)
                     {
                       console.log(response[index]);
                     }
+*/
                     response.sort(function (a, b) 
                     {
                       a = (a._id).split('/');
@@ -87,19 +89,27 @@
                       return a[2] - b[2] || a[1] - b[1] || a[0] - b[0];
                     });
                     console.log("Reverse response : " + response.reverse());
+/*                    
                     for(index in response)
                     {
                       console.log(response[index]);
                     }
+*/
                     var rows=[];
                     var platforms=[];
                     var value;
                     var platformMap = new Map();
                     var value;
+                    var trendsdata33 = {};
+                    trendsdata33.type = "LineChart";
+
 
 
                     for(index in response)
                     {
+                      console.log("----->>>> " + response[index].LineChart[0].id);
+                      platforms = []
+                      platformMap.clear();
                       rows.push
                       (
                         {
@@ -111,48 +121,52 @@
                       );
                       for( var i=0; i< response[index].LineChart.length; ++i )
                       {
-                        console.log("---- Index:" + index  + " i:" + i);
+                        console.log("---- Index:" + index  + " i:" + i + "----");
+
                         eval("var " + response[index].LineChart[i].platform + "per = null;");
                         console.log("var " + response[index].LineChart[i].platform + "per = null;");
+
                         eval(response[index].LineChart[i].platform + "per = " + parseFloat(response[index].LineChart[i].passper));
                         console.log(response[index].LineChart[i].platform + "per = " + parseFloat(response[index].LineChart[i].passper + ";"));
+
                         platforms.push(eval("\"" +response[index].LineChart[i].platform + "per\""));
+
 
                         var key = response[index].LineChart[i].platform + "per";
                         var val = parseFloat(response[index].LineChart[i].passper);
+                        console.log("Pushing : key, value = " + key + " , " + val);
                         platformMap.set(key, val);
-
-                        eval("var value = " + response[index].LineChart[i].platform + "per");
-                        console.log("var value = " + response[index].LineChart[i].platform + "per");
+                        console.log("--------");
                       }
 
-                      console.log("sorting platforms");
+                      console.log("********* start sorting platforms *********");
                       platforms.sort();
                       platforms.reverse();
 
                       for(iter in platforms)
                       {
-                        console.log("platforms[iter] : " + platforms[iter]);
+                        console.log("platforms[" + iter + "] : " + platforms[iter]);
                         value = platformMap.get(platforms[iter]);
-                        console.log("value : " + value);
+                        console.log("pushing value : " + value);
                         
                         rows.push
                         (
                           {
                             c:
                               [
+                                {v: response[index].LineChart[0].id},
                                 { v: value},
                               ]
                           }
                         );                    
+
                       }
+                      console.log("********* end sorting platforms *********");
 
                     }
                     
                     console.log("rows : " + rows);
-                    var trendsdata33 = {};
-                
-                    trendsdata33.type = "LineChart";
+
 
                     trendsdata33.data = 
                     {

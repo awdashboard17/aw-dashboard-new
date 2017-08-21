@@ -158,6 +158,7 @@
                             }
                           );
                     }
+                    console.log("<><><><>><>><><><><><><><><><");
                     console.log(rows);
                     var trendsdata33 = {};
                 
