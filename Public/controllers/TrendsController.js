@@ -39,7 +39,7 @@
           {
               $http.get('/getPreferenceOfProduct/' + product).success( function ( response )
               {
-                  console.log("getPrefReleasesOfProduct successful");
+                  console.log("getProductVersionsOf successful");
                   console.log("response : " + response[0].preference);
                   $scope.clients.awrelease = response[0].preference;
                   $scope.selectedRequest.release = $scope.clients.awrelease[0];

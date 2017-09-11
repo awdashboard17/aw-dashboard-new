@@ -42,7 +42,7 @@
 </br>
 </br></br></br></br>
 
-    <div style="font-size:10px; font-family:calibri;" >
+    <div  style="font-size:10px; font-family:calibri;" >
       <table class="table table-bordered table-striped">
         <thead>
           <tr bgcolor="#e6e6e6">
@@ -51,7 +51,27 @@
             <th>FEATURE</th>
             <th>SCENARIO</th>  
             <th>FAILED STEP</th>
-            <th ng-repeat="col in clients.tcHeaderArray">{{col}}</th>
+            <th ng-repeat="whatever in clients.tcHeaderArray" ng-if="!($index % 6)">
+              <th ng-if="clients.tcHeaderArray[$index + 0]">
+                {{clients.tcHeaderArray[$index + 0]}}
+              </th>
+              <th ng-if="clients.tcHeaderArray[$index + 1]">
+                {{clients.tcHeaderArray[$index + 1]}}
+              </th>
+              <th ng-if="clients.tcHeaderArray[$index + 2]">
+                {{clients.tcHeaderArray[$index + 2]}}
+              </th>
+              <th ng-if="clients.tcHeaderArray[$index + 3]">
+                {{clients.tcHeaderArray[$index + 3]}}
+              </th>
+              <th ng-if="clients.tcHeaderArray[$index + 4]">
+                {{clients.tcHeaderArray[$index + 4]}}
+              </th>
+              <th ng-if="clients.tcHeaderArray[$index + 5]">
+                {{clients.tcHeaderArray[$index + 5]}}
+              </th>
+            </th>
+
           </tr>
         </thead>
         <tbody > 
@@ -61,7 +81,35 @@
           <td>{{record.feature}}</td>
           <td>{{record.scenario}}</td>
           <td>{{record.failedstep}}</td>
-          <td ng-repeat="tcrec in record.tcvalues track by $index">{{tcrec}}</td>
+
+          <td ng-repeat="whatever in record.tcvalues track by $index" ng-if="!($index % 6)">
+            <td ng-if="record.tcvalues[$index + 0]">
+              {{record.tcvalues[$index + 0]}}
+            </td>
+            <td ng-if="!record.tcvalues[$index + 0]">
+              {{'NA'}}
+            </td>
+            <td ng-if="record.tcvalues[$index + 1]">
+              {{record.tcvalues[$index + 1] }}
+            </td>
+            <td ng-if="!record.tcvalues[$index + 1]">
+              {{'NA'}}
+            </td>    
+            <td ng-if="record.tcvalues[$index + 2]">
+              {{record.tcvalues[$index + 2]}}
+            </td>
+            <td ng-if="!record.tcvalues[$index + 2]">
+              {{'NA'}}
+            </td>            
+            <td ng-if="record.tcvalues[$index + 3]">
+              {{record.tcvalues[$index + 3]}}
+            </td>
+            <td ng-if="!record.tcvalues[$index + 3]">
+              {{'NA'}}
+            </td>                      
+          </td>
+
+
         </tr>
         </tbody>
       </table>

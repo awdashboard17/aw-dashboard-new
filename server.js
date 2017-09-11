@@ -469,13 +469,89 @@
 		);
 	});
 
+
+	app.get('/getTeamsOfBuild/:rnb', function( req, res)
+	{
+		console.log("GET request for getTeamsOfRelease");
+		var rnb = req.params.rnb;
+		console.log("rnb : " + rnb);
+		var buildInfo = rnb.split(":");
+
+		db.runCommand({
+			"distinct": buildInfo[0],
+			"query": {  _id: new RegExp(buildInfo[0] + "_" + buildInfo[1])  },
+			"key": "results.Team"
+		},
+		function(err,docs)
+		{
+			console.log(docs);
+			res.send(docs);
+		});
+
+/*
+		db.collection(buildInfo[0]).find({_id: new RegExp(buildInfo[0] + "_" + buildInfo[1])},{_id:0,'Details.Teamwise.team':1}).sort({ $natural: -1 },function(err,docs)
+		{
+			res.send(docs);
+		});
+*/
+/*
+		db.collection( splash[0] ).find({ _id: buildinfo },{}, function (err, docs)
+		{
+			var passfail= docs[0].Details[0].config[0].totalpass +","+docs[0].Details[0].config[0].totalfail;
+			console.log(passfail);
+			res.send(passfail);
+		});
+
+	    db.collection(splash[0]).distinct( 'Details.Teamwise.team' ), function (err, docs)
+		{
+			console.log(docs);
+			res.send(docs);
+		};
+*/
+	});
+
+
+	app.get('/getResultsOfBuild/:rbnt', function( req, res)
+	{
+		console.log("GET request for getResultsOfBuild");
+		var rbnt = req.params.rbnt;
+		console.log("rbnt : " + rbnt);
+		var buildInfo = rbnt.split(":");
+
+		db.runCommand({
+			"distinct": buildInfo[0],
+			"query": {  _id: new RegExp(buildInfo[0] + "_" + buildInfo[1])  },
+			"key": "results"
+		},
+		function(err,docs)
+		{
+			//console.log(docs);
+			res.send(docs);
+		});
+	});
+/*
+	app.get('/getResultsOfBuild2/:rbnt', function( req, res)
+	{
+		console.log("GET request for getTeamsOfRelease");
+		var rbnt = req.params.rbnt;
+		console.log("rbnt : " + rbnt);
+		var buildInfo = rbnt.split(":");
+
+		db.collection(buildInfo[0]).find({_id: new RegExp(buildInfo[0] + "_" + buildInfo[1]), 'results.Team': buildInfo[2]}, {_id:0,'results':1}).sort({ $natural: -1 },
+		function(err,docs)
+		{
+			//console.log(docs);
+			res.send(docs);
+		});
+	});
+*/
+
 	app.get('/getdirectorwiseresultsforbuild/:id', function( req, res)
 	{
 		console.log("GET request for getdirectorwiseresultsforbuild");
 		var buildinfo = req.params.id;
 		console.log(buildinfo);
 		var splash = buildinfo.split("_");
-
 
 		db.collection(splash[0]).aggregate
 		(
