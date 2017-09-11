@@ -6,3 +6,4 @@ uploads/
 Public/bower_components
 Public/_bower_components
 .vscode/
+config/database.js
