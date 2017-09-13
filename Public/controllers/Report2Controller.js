@@ -66,7 +66,8 @@ angular.module('App.filters', []).filter('placeholder', [function () {
                         {
                             getPageData($scope.selectedRequest.awrelease, $scope.selectedRequest.awbuild, $scope.selectedRequest.awteam);
                         }
-                       
+                        else
+                            printReport2(rbnt);
                     });
 
                 });
@@ -178,97 +179,6 @@ angular.module('App.filters', []).filter('placeholder', [function () {
     }
 
 
-/*
-      var getPageData = function( release, build, team )
-      {
-        console.log("*** IN getPageData ***");
-        var rbnt = release + ":" + build + ":" + team ;
-        console.log("rbnt : " + rbnt);
-        var tcverSet = new Set();
-        $http.get('/getResultsOfBuild/' + rbnt).success( function ( response )
-        {
-            console.log("+++++++++++++++++++++ getResultsOfBuild successful");
-            //console.log("response : " + response.values);
-            //console.log("response length : " + response.values.length);
-            var resultDetails;
-
-            var splash;
-            teamcounter = 0;
-            //console.log("response values length : " + response.values.length);
-            var teamwiseKeyObj;
-            var teamwiseValObj;
-
-            //associative array
-            var myArray = new Object();
-
-            console.log("pushing for Team : " + team);
-            for(index in response.values)
-            {
-                resultDetails = response.values[index];
-                console.log("=========================================================================");
-                console.log("build id : " + resultDetails.build_id);
-                splash = resultDetails.build_id.split("_");
-                var myTcversion = splash[2];
-                for (var i=3; i<splash.length; ++i) 
-                {  
-                    myTcversion = myTcversion + "_" + splash[i];
-                } 
-
-                console.log("tc version : " + myTcversion);
-                
-                //var tcver = "\'" + splash[2] + "\'";
-                //console.log("tc version : " + tcver);
-                //console.log("application : " + resultDetails.Application);
-                //console.log("tags : " + resultDetails.tags);
-                //console.log("feature : " + resultDetails.Feature);
-                //console.log("scenario : " + resultDetails.Scenario);
-                //console.log("failedstep : " + resultDetails.errorstep);
-                //console.log(tcver + " : " + resultDetails.result);
-                
-                if(team === resultDetails.Team)
-                {
-                    if(resultDetails.errorstep === '')
-                        errorstep = 'NA';
-                    else
-                        errorstep = resultDetails.errorstep;
-
-                    teamcounter++;
-                    
-                    teamwiseKeyObj = '';
-                    teamwiseKeyObj = release+"^^^"+build+"^^^"+team+"^^^"+resultDetails.Application+"^^^"+resultDetails.tags+"^^^"+resultDetails.Feature+"^^^"+resultDetails.Scenario;
-                    console.log("--------------------------------------------------");
-                    console.log("teamwiseKeyObj : " + teamwiseKeyObj);
-                    
-                    teamwiseValObj = myTcversion + ":" + resultDetails.result;
-                    tcverSet.add(myTcversion);
-                    console.log("teamwiseValObj : " + teamwiseValObj);
-                    var myTcArr = myArray[teamwiseKeyObj];
-                    if(! myTcArr)
-                    {
-                        //console.log("value is null");
-                        var myTcArr = new Object();
-                        myTcArr[myTcversion] = resultDetails.result + ":" + errorstep;
-                        myArray[teamwiseKeyObj] = myTcArr;
-                    }
-                    else
-                    {
-                        //console.log("value not null");
-                        myTcArr[myTcversion] = resultDetails.result + ":" + errorstep;
-                        myArray[teamwiseKeyObj] = myTcArr;
-                    }
-                }
-            }
-            console.log("teamcounter : " + teamcounter);
-            $window.sessionStorage.setItem(rbnt,JSON.stringify(myArray));
-            var tcVersionArray = Array.from(tcverSet);
-            console.log("setting tcversionarray in session : " + tcVersionArray);
-            $window.sessionStorage.setItem(rbnt+"tcSet",JSON.stringify(tcVersionArray));
-            console.log("printin report for rbnt :" + rbnt );
-            printReport2(rbnt);
-                        
-        });
-    }
-*/
     function include(arr, obj) {
         for(var i=0; i<arr.length; i++) {
             if (arr[i] === obj) return true;
