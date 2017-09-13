@@ -15,6 +15,38 @@
 
       refresh();
 
+       $scope.s2ab = function (s) {
+            if (typeof ArrayBuffer !== 'undefined') {
+                var buf = new ArrayBuffer(s.length);
+                var view = new Uint8Array(buf);
+                for (var i = 0; i != s.length; ++i) view[i] = s.charCodeAt(i) & 0xFF;
+                return buf;
+            } else {
+                var buf = new Array(s.length);
+                for (var i = 0; i != s.length; ++i) buf[i] = s.charCodeAt(i) & 0xFF;
+                return buf;
+            }
+        }
+
+      $scope.export_table_to_excel = function (id, type, fn) {
+
+            // XLSX comes from the js file; loaded in the directorwise.html page
+            // TODO: 1. As a temporary measure add the same functionality to the team page
+            //       2. Make the function a part of a directive or a service, for increasing modularity 
+            var wb = XLSX.utils.table_to_book(document.getElementById(id), { sheet: "Team Data" });
+            var wbout = XLSX.write(wb, { bookType: type, bookSST: true, type: 'binary' });
+            var fname = fn || 'Results.' + type;
+            try {
+                saveAs(new Blob([$scope.s2ab(wbout)], { type: "application/octet-stream" }), fname);
+            } catch (e) { if (typeof console != 'undefined') console.log(e, wbout); }
+            return wbout;
+        }
+
+      $scope.exportTeamData = function () {
+            $scope.export_table_to_excel('teamMappingTableContainer', 'xlsx');
+
+        };
+
       $scope.UpdateTeamMappings = function()
       {
         var username = window.prompt("Enter your username","");
