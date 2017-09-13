@@ -132,6 +132,10 @@ angular.module('App.filters', []).filter('placeholder', [function () {
                 
                 if(team === resultDetails.Team)
                 {
+                    console.log("=========================================================================");
+                    console.log("build id : " + resultDetails.build_id);
+                    console.log("tc version : " + myTcversion);
+                    console.log("result : " + resultDetails.result);
                     //console.log("+++++++++++++++ team : " + team);
                     //console.log("+++++++++++++++ resultDetails.Team : " + resultDetails.Team);
                     if(resultDetails.errorstep === '')
@@ -209,21 +213,21 @@ angular.module('App.filters', []).filter('placeholder', [function () {
             var myTcArray = [];
             myTcArray = myarr[key];
 
-            tcKeysTempArray = Object.keys(myTcArray);
-            //console.log("tcKeysTempArray : " + tcKeysTempArray);
-
             for (var i = 0; i < tcVersionArray.length; i++) 
             {
-                //console.log("checking for include(" + tcKeysTempArray + "," + tcVersionArray[i] + ")");
+                var tcKeysTempArray = Object.keys(myTcArray);
+                //console.log("tcKeysTempArray : " + tcKeysTempArray);
+                //console.log("checking for include(" + tcKeysTempArray + ", IN ELEMENT - " + tcVersionArray[i] + ")");
                 if(!include(tcKeysTempArray, tcVersionArray[i]))
                 {
-                    //console.log("element not present. pushing myTcArray[" + tcVersionArray[i] + "] = NA");
+                    console.log("element not present. pushing myTcArray[" + tcVersionArray[i] + "] = NA:NA");
                     myTcArray[tcVersionArray[i]] = 'NA:NA';
                 }
             }
 
             if(myTcArray)
             {
+               
                 for(var key2 in myTcArray)
                 {
                     //console.log("key2 : " + key2);
@@ -238,12 +242,26 @@ angular.module('App.filters', []).filter('placeholder', [function () {
                 }
 
                 var tcValuesArray = [];
-                tcValuesArray = Object.values(myTcArray);
-                
+                var sorted_keys = Object.keys(myTcArray).sort();
+                var push = false;
+                for(i=0; i<sorted_keys.length; ++i)
+                {
+                    var value = myTcArray[sorted_keys[i]];
+                    console.log("myTcArray[" + sorted_keys[i] + "] = " + value);
+                    tcValuesArray.push(value);
+                    if(value === 'failed')
+                    {
+                        console.log("changing push to true... ");
+                        push = true;
+                    }
+                }
+
                 tcValuesArray.reverse();
-                //console.log("tcValuesArray : " + tcValuesArray);
-                //push values for tcresults
-                report2Array.push({application: application, tags:tags, feature:feature, scenario:scenario, failedstep: errorstep, tcvalues: tcValuesArray});
+                console.log(">>>>>>>>>>>> : after reverse tcValuesArray : " + tcValuesArray);
+
+                //push values for tcresults only if it has failed values.
+                if(push)
+                    report2Array.push({application: application, tags:tags, feature:feature, scenario:scenario, failedstep: errorstep, tcvalues: tcValuesArray});
                 //console.log("pushing : " + application + ":" + tags  + ":" + feature + ":" + scenario + ":" + errorstep + ":" + tcValuesArray);
             }
         }
@@ -253,7 +271,7 @@ angular.module('App.filters', []).filter('placeholder', [function () {
             var splash = tcVersionArray[i].split('_');
             tcVersionArray[i] = splash[0];
         }
-        //console.log("tcHeaderArray : " + tcVersionArray);
+        console.log("+++++++++++++ : after reverse tcHeaderArray : " + tcVersionArray);
         $scope.clients.tcHeaderArray = tcVersionArray;
         $scope.clients.report = report2Array;
     }
