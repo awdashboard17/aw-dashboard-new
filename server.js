@@ -196,6 +196,7 @@
 		var build = splash[1];
 		var team = splash[2];
 		var scenario = splash[3];
+		
 		db.collection( release[0] ).update
 		(
 			{
@@ -219,6 +220,7 @@
 				res.send(docs);
 			}
 		)
+		
 	});
 
 	app.put('/UpdateCommentForFailed/:id',function(req, res)

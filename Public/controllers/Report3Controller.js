@@ -1,30 +1,14 @@
-var myApp = angular.module('myApp', ['xeditable', 'ngFileUpload']);
-/*
-angular.module('App.filters', []).filter('placeholder', [function () {
-    return function (text, placeholder) {
+    var myApp = angular.module('myApp', []);
 
-        console.log("****************** IN FILTER *******************");
-        console.log("text : " +text);
-        if(text === null){
-            console.log("NULL VALUE");
-            return placeholder;
-        }
-        console.log("TEXT NOT NULL");
-        return text;
-    };
-}]);
-*/
-    myApp.controller('Report2Ctrl', ['$scope', '$http', '$window', function ($scope, $http, $window)
+    myApp.controller('Report3Ctrl', ['$scope', '$http', '$window', function ($scope, $http, $window)
     {
       $scope.clients = [];
       $scope.clients.awproducts = [];
-      $scope.clients.tcHeaderArray2 = [];
 
       $scope.BringBackBaseLines = function()
       {
         console.log("In the show report 2");
 
-        // Get all products. e.g. AW, TC
         $http.get('/getAllProducts').success(function (response)
         {
             console.log(" Received from database : getAllProducts : ");
@@ -32,10 +16,9 @@ angular.module('App.filters', []).filter('placeholder', [function () {
 
             $scope.clients.awproducts = response;
             $scope.selectedRequest = {};
-            //console.log("$scope.clients.awproducts[0] : " + $scope.clients.awproducts[0]);
+            console.log("$scope.clients.awproducts[0] : " + $scope.clients.awproducts[0]);
             $scope.selectedRequest.awproduct = $scope.clients.awproducts[0];
 
-            // Get all releases from products. e.g. AW34, AW32 etc
             $http.get('/getPreferenceOfProduct/' + $scope.selectedRequest.awproduct).success( function ( response )
             {
                 console.log("BringBackReleases successful");
@@ -44,20 +27,19 @@ angular.module('App.filters', []).filter('placeholder', [function () {
                 $scope.clients.awreleases = [];
                 $scope.clients.awreleases = response[0].preference;
                 $scope.selectedRequest.awrelease = $scope.clients.awreleases[0];
-                //console.log($scope.selectedRequest.awrelease);
+                console.log($scope.selectedRequest.awrelease);
 
-                // Get all builds for release selected. e.g. 0828, 0822 etc
                 $http.get('/getBuildsOf/' + $scope.selectedRequest.awrelease).success( function ( response )
                 {
+                    console.log("getBuildsOf successful");
                     //console.log("response : " + response);
                     $scope.clients.awbuilds = [];
                     $scope.clients.awbuilds = response;
-                    $scope.selectedRequest.awbuild = $scope.clients.awbuilds[3];
+                    $scope.selectedRequest.awbuild = $scope.clients.awbuilds[0];
 
                     var rnb = $scope.selectedRequest.awrelease+":"+$scope.selectedRequest.awbuild;
-                    //console.log("rnb : " + rnb);
+                    console.log("rnb : " + rnb);
 
-                    // Get all teams for the build date selected. e.g. 0828, 0822 etc
                     $http.get('/getTeamsOfBuild/' + rnb).success( function ( response )
                     {
                         //console.log("TEAMS : " + response.values);
@@ -65,15 +47,16 @@ angular.module('App.filters', []).filter('placeholder', [function () {
                         teams = response.values;
                         $scope.clients.awteams = [];
                         $scope.clients.awteams =  teams;
-                        $scope.selectedRequest.awteam = $scope.clients.awteams[20];
+                        $scope.selectedRequest.awteam = $scope.clients.awteams[0];
 
                         var rbnt = $scope.selectedRequest.awrelease + ":" + $scope.selectedRequest.awbuild + ":" + $scope.selectedRequest.awteam ;
-                        if (!JSON.parse(sessionStorage.getItem(rbnt+"Report2")))
+                        if (!JSON.parse(sessionStorage.getItem(rbnt)))
                         {
                             getPageData($scope.selectedRequest.awrelease, $scope.selectedRequest.awbuild, $scope.selectedRequest.awteam);
-                        }
+                        }                        
                         else
-                            printReport2(rbnt);
+                            printReport3(rbnt);
+                       
                     });
 
                 });
@@ -82,12 +65,31 @@ angular.module('App.filters', []).filter('placeholder', [function () {
         });
       };
 
+
       // This function is to populate the data for a particular release, build and team in Report2 format
       var getPageData = function( release, build, team )
       {
         console.log("*** IN getPageData ***");
         var rbnt = release + ":" + build + ":" + team ;
-        //console.log("rbnt : " + rbnt);
+        console.log("rbnt : " + rbnt);
+
+/*
+        var rnb = release + ":" + build;
+        $http.get('/getDistErrorstepsOfBuild/' + rnb).success( function ( response )
+        {
+            console.log("getDistErrorstepsOfBuild successful");
+            //console.log("response : " + response.values);
+            var errorstepsArray = [];
+            errorstepsArray = response.values;
+            //remove empty element
+            var index = errorstepsArray.indexOf('');
+            if (index > -1) {
+                errorstepsArray.splice(index, 1);
+            }
+            console.log("after : " + errorstepsArray);
+        });
+*/
+
 
         // This set is use to collect all the releases for selected rel, build and team. e.g. Tc1123, Tc1140 etc.
         var tcverSet = new Set();
@@ -126,21 +128,8 @@ angular.module('App.filters', []).filter('placeholder', [function () {
                 splash = resultDetails.build_id.split("_");
                 var myTcversion = splash[2];
                 for (var i=3; i<splash.length; ++i) 
-                {  
                     myTcversion = myTcversion + "_" + splash[i];
-                } 
 
-                //console.log("tc version : " + myTcversion);
-                //console.log("result : " + resultDetails.result);
-                //var tcver = "\'" + splash[2] + "\'";
-                //console.log("tc version : " + tcver);
-                //console.log("application : " + resultDetails.Application);
-                //console.log("tags : " + resultDetails.tags);
-                //console.log("feature : " + resultDetails.Feature);
-                //console.log("scenario : " + resultDetails.Scenario);
-                //console.log("failedstep : " + resultDetails.errorstep);
-                //console.log(tcver + " : " + resultDetails.result);
-                
                 // If team is same as the team selected by user.
                 if(team === resultDetails.Team)
                 {
@@ -151,54 +140,73 @@ angular.module('App.filters', []).filter('placeholder', [function () {
                     //console.log("+++++++++++++++ team : " + team);
                     //console.log("+++++++++++++++ resultDetails.Team : " + resultDetails.Team);
 
-                    // If errorstep database value is empty then push 'NA'
-                    if(resultDetails.errorstep === '')
-                        errorstep = 'NA';
-                    else
-                        errorstep = resultDetails.errorstep;
-
-                    // Form key object to store each row in report2
+                    // Form key object to store each row in report3
                     teamwiseKeyObj = '';
-                    teamwiseKeyObj = release+"^^^"+build+"^^^"+team+"^^^"+resultDetails.Application+"^^^"+resultDetails.tags+"^^^"+resultDetails.Feature+"^^^"+resultDetails.Scenario;
-                    //console.log("--------------------------------------------------");
-                    //console.log("teamwiseKeyObj : " + teamwiseKeyObj);
+                    teamwiseKeyObj = release+"^^^"+build+"^^^"+team;
+                    console.log("--------------------------------------------------");
+                    console.log("teamwiseKeyObj : " + teamwiseKeyObj);
                     
                     tcverSet.add(myTcversion);
-                    var myTcArr = myArray[teamwiseKeyObj];
-                    if(! myTcArr)
+
+                    var errorstep = resultDetails.errorstep;
+                    myTcArray = myArray[errorstep];
+                    if(!myTcArray)
                     {
-                        //console.log("value is null");
-                        var myTcArr = new Object();
-                        myTcArr[myTcversion] = resultDetails.result + ":" + errorstep;
-                        //console.log("pushing element : myTcArr[" + myTcversion + "] = " + resultDetails.result + ":" + errorstep);
-                        myArray[teamwiseKeyObj] = myTcArr;
+                        var myTcArray = new Object();
+                        myTcArray[myTcversion] = 0;
                     }
                     else
                     {
-                        //console.log("value already present");
-                        myTcArr[myTcversion] = resultDetails.result + ":" + errorstep;
-                        //console.log("pushing element : myTcArr[" + myTcversion + "] = " + resultDetails.result + ":" + errorstep);
-                        myArray[teamwiseKeyObj] = myTcArr;
+                        var keys = Object.keys(myTcArray);
+                        var found = findObjInArray(keys, myTcversion);
+                        if(!found)
+                        {
+                            myTcArray[myTcversion] = 0;
+                        }
                     }
+
+                    if(resultDetails.result==='failed')
+                    {
+                        console.log("myTcArray is null : failed");
+                        console.log("incrementing count : myTcArray[" + myTcversion + "] = 1");
+                        var count = myTcArray[myTcversion];
+                        myTcArray[myTcversion] = ++count;
+                        myArray[errorstep] = myTcArray;
+                    }
+
                 }
             }
 
-            $window.sessionStorage.setItem(rbnt+"Report2",JSON.stringify(myArray));
+            $window.sessionStorage.setItem(rbnt+"Report3",JSON.stringify(myArray));
             var tcVersionArray = Array.from(tcverSet);
             tcVersionArray.sort();
             console.log("after sorting tcVersionArray : " + tcVersionArray);
-
-            //console.log("setting tcversionarray in session : " + tcVersionArray);
-            $window.sessionStorage.setItem(rbnt+"tcSet"+"Report2",JSON.stringify(tcVersionArray));
-            //console.log("printin report for rbnt :" + rbnt );
-            printReport2(rbnt);
+            $window.sessionStorage.setItem(rbnt+"tcSet"+"Report3",JSON.stringify(tcVersionArray));
+            printReport3(rbnt);
                                 
         });
-
             
     }
 
-    // function to find object in an array.
+      $scope.refreshReport3 = function( release, build, team )
+      {
+        console.log("*** IN refreshReport3 ***");
+        var rbnt = release + ":" + build + ":" + team ;
+        //console.log("rbnt : " + rbnt);
+        var myArray = JSON.parse(sessionStorage.getItem(rbnt+"Report3"));
+        if (!myArray)
+        {
+            //console.log("Creating Data for 1st time for team : " + team);
+            getPageData(release, build, team);
+        }
+        else
+        {
+            //console.log("Getting from session object");
+            printReport3(rbnt);
+        }
+      };
+
+   // function to find object in an array.
     function findObjInArray(arr, obj) {
         for(var i=0; i<arr.length; i++) {
             if (arr[i] === obj) return true;
@@ -207,32 +215,29 @@ angular.module('App.filters', []).filter('placeholder', [function () {
     }
 
     // function to print the report2
-    var printReport2 = function( rbnt )
+    var printReport3 = function( rbnt )
     {
-        console.log("*** IN printReport2 ***");
-        //Get the stored report2 item from sessionstorage
-        var myarr = JSON.parse(sessionStorage.getItem(rbnt+"Report2"));
-        var tcVersionArray = JSON.parse(sessionStorage.getItem(rbnt+"tcSet"+"Report2"));
+        console.log("*** IN printReport3 ***");
+        //Get the stored report3 item from sessionstorage
+        var myArray = JSON.parse(sessionStorage.getItem(rbnt+"Report3"));
+        var tcVersionArray = JSON.parse(sessionStorage.getItem(rbnt+"tcSet"+"Report3"));
+        console.log("tcVersionArray : " + tcVersionArray);
 
-        //console.log("tcVersionArray : " + tcVersionArray);
-
-        //report2Array for storing row values. tcHeaderArray to store header values of report
-        var report2Array = [];
+        //report3Array for storing row values. tcHeaderArray to store header values of report
+        var report3Array = [];
         var tcHeaderArray = [];
         var splash, splash2;
-        for(var key in myarr)
+
+        for(var key in myArray)
         {
-            //console.log("*( key : " + key + " )*");
-            splash = key.split("^^^");
-            var application = splash[3];
-            var tags = splash[4];
-            var feature = splash[5];
-            var scenario = splash[6];
-            var errorstep;
+            console.log("*(myArray - key : " + key + " )*");
+            var errorstep = key;
+            //splash = key.split("^^^");
+            //var application = splash[3];
 
+            // Pushing count 0 for rows which dont have [errosteps + tcrelease]
             var myTcArray = [];
-            myTcArray = myarr[key];
-
+            myTcArray = myArray[key];
             for (var i = 0; i < tcVersionArray.length; i++) 
             {
                 var tcKeysTempArray = Object.keys(myTcArray);
@@ -240,45 +245,21 @@ angular.module('App.filters', []).filter('placeholder', [function () {
                 console.log("checking for findObjInArray(" + tcKeysTempArray + ", OBJECT - " + tcVersionArray[i] + ")");
                 if(!findObjInArray(tcKeysTempArray, tcVersionArray[i]))
                 {
-                    console.log("element not present. pushing myTcArray[" + tcVersionArray[i] + "] = NA:NA");
-                    myTcArray[tcVersionArray[i]] = 'NA:NA';
+                    console.log("element not present. pushing myTcArray[" + tcVersionArray[i] + "] = 0");
+                    myTcArray[tcVersionArray[i]] = 0;
                 }
             }
 
             if(myTcArray)
             {
-/*               
-                for(var key2 in myTcArray)
-                {
-                    //console.log("key2 : " + key2);
-                    var value = myTcArray[key2];                        
-                    //console.log("----( " + key2 + " === " + value + " )----");
-                    spash2 = '';
-                    splash2 = value.split(":");
-                    console.log(key2 + " : " + splash2[0] + " : " + splash2[1]);
-                    errorstep = '';
-                    errorstep = splash2[1];
-                    myTcArray[key2] = splash2[0];
-                }
-*/
                 var tcValuesArray = [];
                 var sorted_keys = Object.keys(myTcArray).sort();
-                var push = false;
                 for(i=0; i<sorted_keys.length; ++i)
                 {
-                    //console.log(">>>>>>>>>>> : " + sorted_keys[i] + " : " + myTcArray[sorted_keys[i]]);
+                    console.log(">>>>>>>>>>> : " + sorted_keys[i] + " : " + myTcArray[sorted_keys[i]]);
                     var value = myTcArray[sorted_keys[i]];
                     console.log("myTcArray[" + sorted_keys[i] + "] = " + value);
-                    
-                    var temp = value.split(":");
-                    if(temp[0] === 'passed')
-                        value = temp[0];
                     tcValuesArray.push(value);
-                    if(temp[0] === 'failed')
-                    {
-                        console.log("changing push to true... ");
-                        push = true;
-                    }
                 }
 
                 console.log(">>>>>>>>>>>> : before reverse tcValuesArray : " + tcValuesArray);
@@ -286,11 +267,8 @@ angular.module('App.filters', []).filter('placeholder', [function () {
                 console.log(">>>>>>>>>>>> : after reverse tcValuesArray : " + tcValuesArray);
 
                 //push values for tcresults only if it has failed values.
-                if(push)
-                {
-                    report2Array.push({application: application, tags:tags, feature:feature, scenario:scenario, tcvalues: tcValuesArray});
-                    console.log("pushing : " + application + ":" + tags  + ":" + feature + ":" + scenario + ":" + tcValuesArray);
-                }
+                report3Array.push({feature: 'NA', errorstep: errorstep, tcvalues: tcValuesArray});
+                console.log("pushing : " + errorstep + ":" + tcValuesArray);
             }
         }
         tcVersionArray.reverse();
@@ -303,59 +281,16 @@ angular.module('App.filters', []).filter('placeholder', [function () {
         }
         console.log("+++++++++++++ : after reverse tcHeaderArray : " + tcVersionArray);
         $scope.clients.tcHeaderArray = tcVersionArray;
-        $scope.clients.report = report2Array;
+        $scope.clients.report = report3Array;
     }
 
-      $scope.refreshReport2 = function( release, build, team )
-      {
-        console.log("*** IN refreshReport2 ***");
-        var rbnt = release + ":" + build + ":" + team ;
-        //console.log("rbnt : " + rbnt);
-        var myArray = JSON.parse(sessionStorage.getItem(rbnt+"Report2"));
-        if (!myArray)
-        {
-            //console.log("Creating Data for 1st time for team : " + team);
-            getPageData(release, build, team);
-        }
-        else
-        {
-            //console.log("Getting from session object");
-            printReport2(rbnt);
-        }
-      };
-
-        $scope.updateDefectId = function( data, scenario, tcvalues )
-        {
-            console.log("Data : "+ data);
-            console.log("Scenario: "+ scenario);
-            //var all = data+"^^^"+build+"^^^"+team+"^^^"+scenario;
-            //console.log(all);
-            console.log($scope.selectedRequest.awrelease);
-            console.log($scope.selectedRequest.awbuild);
-            console.log($scope.selectedRequest.awteam);
-            for(var i=0; i<tcvalues.length; ++i)
-            {
-                console.log("tcversion : " +tcvalues[i]);
-            }
-
-            build = $scope.selectedRequest.awrelease + "_" + $scope.selectedRequest.awbuild + "_" + tcvalues[0];
-            var all = data+"^^^"+build+"^^^"+$scope.selectedRequest.awteam+"^^^"+scenario;
-            console.log(all);
-
-
-            $http.put('/UpdateDefIdForFailed/'+ all ).success(function (response)
-            {
-                console.log("Success Message: "+ response);
-            });
-           
-        };
 
       $scope.changeProductVersionsOf = function( product )
       {
         $http.get('/getPreferenceOfProduct/' + product).success( function ( response )
         {
             console.log("getProductVersionsOf successful");
-            //console.log("response : " + response[0].preference);
+            console.log("response : " + response[0].preference);
             $scope.clients.awreleases = response[0].preference;
             $scope.selectedRequest.awrelease = $scope.clients.awreleases[0];
         });
@@ -365,7 +300,7 @@ angular.module('App.filters', []).filter('placeholder', [function () {
       {
         $http.get('/getBuildsOf/' + release).success( function ( response )
         {
-            //console.log("response : " + response);
+            console.log("response : " + response);
             $scope.clients.awbuilds = [];
             $scope.clients.awbuilds = response;
             $scope.selectedRequest.awbuild =  $scope.clients.awbuilds[0];
