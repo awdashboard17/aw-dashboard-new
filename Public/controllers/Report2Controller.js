@@ -16,6 +16,8 @@ angular.module('App.filters', []).filter('placeholder', [function () {
 */
     myApp.controller('Report2Ctrl', ['$scope', '$http', '$window', function ($scope, $http, $window)
     {
+      $scope.columnSort = { sortColumn: 'col1', reverse: false }; 
+      
       $scope.clients = [];
       $scope.clients.awproducts = [];
       $scope.clients.tcHeaderArray2 = [];
