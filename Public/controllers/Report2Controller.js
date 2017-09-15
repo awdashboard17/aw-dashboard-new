@@ -17,7 +17,7 @@ angular.module('App.filters', []).filter('placeholder', [function () {
     myApp.controller('Report2Ctrl', ['$scope', '$http', '$window', function ($scope, $http, $window)
     {
       $scope.columnSort = { sortColumn: 'col1', reverse: false }; 
-      
+
       $scope.clients = [];
       $scope.clients.awproducts = [];
       $scope.clients.tcHeaderArray2 = [];
@@ -54,7 +54,7 @@ angular.module('App.filters', []).filter('placeholder', [function () {
                     //console.log("response : " + response);
                     $scope.clients.awbuilds = [];
                     $scope.clients.awbuilds = response;
-                    $scope.selectedRequest.awbuild = $scope.clients.awbuilds[3];
+                    $scope.selectedRequest.awbuild = $scope.clients.awbuilds[0];
 
                     var rnb = $scope.selectedRequest.awrelease+":"+$scope.selectedRequest.awbuild;
                     //console.log("rnb : " + rnb);
@@ -67,7 +67,7 @@ angular.module('App.filters', []).filter('placeholder', [function () {
                         teams = response.values;
                         $scope.clients.awteams = [];
                         $scope.clients.awteams =  teams;
-                        $scope.selectedRequest.awteam = $scope.clients.awteams[20];
+                        $scope.selectedRequest.awteam = $scope.clients.awteams[0];
 
                         var rbnt = $scope.selectedRequest.awrelease + ":" + $scope.selectedRequest.awbuild + ":" + $scope.selectedRequest.awteam ;
                         if (!JSON.parse(sessionStorage.getItem(rbnt+"Report2")))
@@ -382,7 +382,6 @@ angular.module('App.filters', []).filter('placeholder', [function () {
             console.log("getTeamsOfBuild successful");
             $scope.clients.awteams = [];
             $scope.clients.awteams =  response.values;
-            $scope.clients.awteams.push('All');
             $scope.selectedRequest.awteam = $scope.clients.awteams[0];
         });
       };

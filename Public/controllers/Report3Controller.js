@@ -315,7 +315,6 @@
             console.log("getTeamsOfBuild successful");
             $scope.clients.awteams = [];
             $scope.clients.awteams =  response.values;
-            $scope.clients.awteams.push('All');
             $scope.selectedRequest.awteam = $scope.clients.awteams[0];
         });
       };
