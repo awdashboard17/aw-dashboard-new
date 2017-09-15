@@ -60,7 +60,7 @@
                   <span ng-show="sortType == 'errorstep' && sortReverse" class="fa fa-caret-up"></span>
                 </a>
             </th>> 
-            <th ng-repeat="col in clients.tcHeaderArray">{{col}}</th>           
+            <th ng-repeat="col in clients.tcHeaderArray track by $index">{{col}}</th>           
           </tr>
         </thead>
         <tbody > 
