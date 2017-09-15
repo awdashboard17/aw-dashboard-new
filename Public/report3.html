@@ -47,13 +47,6 @@
         <thead>
           <tr bgcolor="#e6e6e6">
             <th style="text-align:left;">
-              <a ng-click="sortType = 'category'; sortReverse = !sortReverse">
-                  CATEGORY
-                  <span ng-show="sortType == 'category' && !sortReverse" class="fa fa-caret-down"></span>
-                  <span ng-show="sortType == 'category' && sortReverse" class="fa fa-caret-up"></span>
-                </a>
-            </th>
-            <th style="text-align:left;">
               <a ng-click="sortType = 'errorstep'; sortReverse = !sortReverse">
                   FAILED STEP
                   <span ng-show="sortType == 'errorstep' && !sortReverse" class="fa fa-caret-down"></span>
@@ -65,7 +58,6 @@
         </thead>
         <tbody > 
         <tr ng-repeat="record in clients.report | orderBy:sortType:!sortReverse ">
-          <td>{{record.feature}}</td>
           <td>{{record.errorstep}}</td>
           <td ng-repeat="tcrec in record.tcvalues track by $index">{{tcrec}}</td>
         </tr>
