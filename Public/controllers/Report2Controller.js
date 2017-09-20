@@ -342,8 +342,8 @@ angular.module('App.filters', []).filter('placeholder', [function () {
 
             build = $scope.selectedRequest.awrelease + "_" + $scope.selectedRequest.awbuild + "_" + tcvalues[0];
             var all = data+"^^^"+build+"^^^"+$scope.selectedRequest.awteam+"^^^"+scenario;
+            //var all = data+"^^^"+ 'AW34_0306_Tc1015_1013b'+"^^^"+'SDPD - Analysis Request'+"^^^"+'validate AR Filter';
             console.log(all);
-
 
             $http.put('/UpdateDefIdForFailed/'+ all ).success(function (response)
             {

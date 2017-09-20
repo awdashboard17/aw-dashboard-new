@@ -191,11 +191,17 @@
 	{
 		var splash = (req.params.id).split("^^^");
 		var release = (splash[1]).split("_");
-		console.log("Release:"+ release[0]);console.log("Comment:"+ splash[0]);console.log("Build: "+ splash[1] );console.log("Team: "+ splash[2] );console.log("Scenario: "+ splash[3]);
-		var comment = splash[0];
+		//console.log("Release:"+ release[0]);console.log("defect:"+ splash[0]);console.log("Build: "+ splash[1] );console.log("Team: "+ splash[2] );console.log("Scenario: "+ splash[3]);
+		var defect = splash[0];
 		var build = splash[1];
 		var team = splash[2];
 		var scenario = splash[3];
+
+		console.log("release :" + release[0]);
+		console.log("defect :" + defect);
+		console.log("build :" + build);
+		console.log("team :" + team);
+		console.log("scenario :" + scenario);
 		
 		db.collection( release[0] ).update
 		(
@@ -206,13 +212,12 @@
 					{
 						"build_id": build,
 						"Team"    : team,
-						"result"  : "failed",
 						"Scenario": scenario
 					}
 				}
 			},
 			{
-				$set: {'results.$.defid' : comment }
+				$set: {'results.$.defid' : defect }
 			},
 			function(err, docs)
 			{
