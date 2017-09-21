@@ -191,9 +191,9 @@
 	{
 		var splash = (req.params.id).split("^^^");
 		var release = (splash[1]).split("_");
-		//console.log("Release:"+ release[0]);console.log("defect:"+ splash[0]);console.log("Build: "+ splash[1] );console.log("Team: "+ splash[2] );console.log("Scenario: "+ splash[3]);
+		//console.log("Release:"+ release[0]);console.log("defect:"+ splash[0]);console.log("build_id: "+ splash[1] );console.log("Team: "+ splash[2] );console.log("Scenario: "+ splash[3]);
 		var defect = splash[0];
-		var build = splash[1];
+		var build_id = splash[1];
 		var team = splash[2];
 		var scenario = splash[3];
 
@@ -210,7 +210,7 @@
 				{
 					$elemMatch:
 					{
-						"build_id": build,
+						"build_id": build_id,
 						"Team"    : team,
 						"Scenario": scenario
 					}
