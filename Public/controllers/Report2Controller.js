@@ -84,14 +84,26 @@ angular.module('App.filters', []).filter('placeholder', [function () {
         });
       };
 
-      // This function is to populate the data for a particular release, build and team in Report2 format
+      /* This function is to populate the data for a particular release, build and team in Report2 format
+         
+         The data(each row printed in the report) is stored in associative arrays as follows:
+         myArray[release+"^^^"+build+"^^^"+team+"^^^"+resultDetails.Application+"^^^"+resultDetails.tags+"^^^"+resultDetails.Feature+"^^^"+resultDetails.Scenario] = TcArray;
+
+         And each TcArray is again an associative array as below:
+         TcArray[tcversion] = "result:errorstep";
+         e.g. 
+         TcArray[Tc1140] = failed:And I press "Reset" button on notification message
+         TcArray[Tc1130] = passed:NA
+         TcArray[Tc11231] = NA:NA
+      */
+
       var getPageData = function( release, build, team )
       {
         console.log("*** IN getPageData ***");
         var rbnt = release + ":" + build + ":" + team ;
         //console.log("rbnt : " + rbnt);
 
-        // This set is use to collect all the releases for selected rel, build and team. e.g. Tc1123, Tc1140 etc.
+        // This set is use to collect all the tc versions for selected rel, build and team. e.g. Tc1123, Tc1140 etc.
         var tcverSet = new Set();
         $http.get('/getResultsOfBuild/' + rbnt).success( function ( response )
         {
@@ -165,6 +177,7 @@ angular.module('App.filters', []).filter('placeholder', [function () {
                     //console.log("--------------------------------------------------");
                     //console.log("teamwiseKeyObj : " + teamwiseKeyObj);
                     
+                    // Add tc version in set. This is to get all unique tcversions for this release-build.
                     tcverSet.add(myTcversion);
                     var myTcArr = myArray[teamwiseKeyObj];
                     if(! myTcArr)
@@ -185,18 +198,19 @@ angular.module('App.filters', []).filter('placeholder', [function () {
                 }
             }
 
+            // Store report2 object for release + build + team in session object.
             $window.sessionStorage.setItem(rbnt+"Report2",JSON.stringify(myArray));
             var tcVersionArray = Array.from(tcverSet);
             tcVersionArray.sort();
             console.log("after sorting tcVersionArray : " + tcVersionArray);
 
+            // Store tcset object for release + build + team in session object.
             //console.log("setting tcversionarray in session : " + tcVersionArray);
             $window.sessionStorage.setItem(rbnt+"tcSet"+"Report2",JSON.stringify(tcVersionArray));
             //console.log("printin report for rbnt :" + rbnt );
             printReport2(rbnt);
                                 
         });
-
             
     }
 
@@ -239,9 +253,13 @@ angular.module('App.filters', []).filter('placeholder', [function () {
             {
                 var tcKeysTempArray = Object.keys(myTcArray);
                 //console.log("tcKeysTempArray : " + tcKeysTempArray);
-                console.log("checking for findObjInArray(" + tcKeysTempArray + ", OBJECT - " + tcVersionArray[i] + ")");
+                //console.log("checking for findObjInArray(" + tcKeysTempArray + ", OBJECT - " + tcVersionArray[i] + ")");
+
+                // Check whether tcversion is present in AllTcVersionArray for rbnt. i.e. array created from tcset keys.
                 if(!findObjInArray(tcKeysTempArray, tcVersionArray[i]))
                 {
+                    //if element not present then add the tcversion(key) in TcArray with value NA:NA
+                    //e.g. TcArray[tc1140] = NA:NA
                     console.log("element not present. pushing myTcArray[" + tcVersionArray[i] + "] = NA:NA");
                     myTcArray[tcVersionArray[i]] = 'NA:NA';
                 }
@@ -266,11 +284,13 @@ angular.module('App.filters', []).filter('placeholder', [function () {
                 var tcValuesArray = [];
                 var sorted_keys = Object.keys(myTcArray).sort();
                 var push = false;
+
+                // This loop is to find if each row printed in report has atleast one result as failed, then only push/print that line in report.
                 for(i=0; i<sorted_keys.length; ++i)
                 {
                     //console.log(">>>>>>>>>>> : " + sorted_keys[i] + " : " + myTcArray[sorted_keys[i]]);
                     var value = myTcArray[sorted_keys[i]];
-                    console.log("myTcArray[" + sorted_keys[i] + "] = " + value);
+                    //console.log("myTcArray[" + sorted_keys[i] + "] = " + value);
                     
                     var temp = value.split(":");
                     if(temp[0] === 'passed')
@@ -278,36 +298,37 @@ angular.module('App.filters', []).filter('placeholder', [function () {
                     tcValuesArray.push(value);
                     if(temp[0] === 'failed')
                     {
-                        console.log("changing push to true... ");
+                        //console.log("changing push to true... ");
                         push = true;
                     }
                 }
 
-                console.log(">>>>>>>>>>>> : before reverse tcValuesArray : " + tcValuesArray);
+                //console.log(">>>>>>>>>>>> : before reverse tcValuesArray : " + tcValuesArray);
                 tcValuesArray.reverse();
-                console.log(">>>>>>>>>>>> : after reverse tcValuesArray : " + tcValuesArray);
+                //console.log(">>>>>>>>>>>> : after reverse tcValuesArray : " + tcValuesArray);
 
                 //push values for tcresults only if it has failed values.
                 if(push)
                 {
                     report2Array.push({application: application, tags:tags, feature:feature, scenario:scenario, tcvalues: tcValuesArray});
-                    console.log("pushing : " + application + ":" + tags  + ":" + feature + ":" + scenario + ":" + tcValuesArray);
+                    //console.log("pushing : " + application + ":" + tags  + ":" + feature + ":" + scenario + ":" + tcValuesArray);
                 }
             }
         }
         tcVersionArray.reverse();
         $scope.clients.tcHeaderArray2 = Array.from(tcVersionArray);
-        console.log("MYtcVersionArray : " + $scope.clients.tcHeaderArray2);
+        //console.log("MYtcVersionArray : " + $scope.clients.tcHeaderArray2);
         for(var i=0; i<tcVersionArray.length; ++i)
         {
             var splash = tcVersionArray[i].split('_');
             tcVersionArray[i] = splash[0];
         }
-        console.log("+++++++++++++ : after reverse tcHeaderArray : " + tcVersionArray);
+        //console.log("+++++++++++++ : after reverse tcHeaderArray : " + tcVersionArray);
         $scope.clients.tcHeaderArray = tcVersionArray;
         $scope.clients.report = report2Array;
     }
 
+      // This function is called when you change the team on the report page.
       $scope.refreshReport2 = function( release, build, team )
       {
         console.log("*** IN refreshReport2 ***");
@@ -326,6 +347,7 @@ angular.module('App.filters', []).filter('placeholder', [function () {
         }
       };
 
+        // This function is called to update the defect Id into the database.
         $scope.updateDefectId = function( data, scenario, tcvalues )
         {
             console.log("Data : "+ data);
@@ -356,7 +378,7 @@ angular.module('App.filters', []).filter('placeholder', [function () {
       {
         $http.get('/getPreferenceOfProduct/' + product).success( function ( response )
         {
-            console.log("getProductVersionsOf successful");
+            console.log("getPreferenceOfProduct successful");
             //console.log("response : " + response[0].preference);
             $scope.clients.awreleases = response[0].preference;
             $scope.selectedRequest.awrelease = $scope.clients.awreleases[0];
@@ -367,6 +389,7 @@ angular.module('App.filters', []).filter('placeholder', [function () {
       {
         $http.get('/getBuildsOf/' + release).success( function ( response )
         {
+            console.log("getBuildsOf successful");
             //console.log("response : " + response);
             $scope.clients.awbuilds = [];
             $scope.clients.awbuilds = response;

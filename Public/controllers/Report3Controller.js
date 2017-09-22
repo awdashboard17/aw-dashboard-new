@@ -21,7 +21,7 @@
 
             $http.get('/getPreferenceOfProduct/' + $scope.selectedRequest.awproduct).success( function ( response )
             {
-                console.log("BringBackReleases successful");
+                console.log("getPreferenceOfProduct successful");
                 //console.log("response : " + response[0].preference);
 
                 $scope.clients.awreleases = [];
@@ -42,6 +42,7 @@
 
                     $http.get('/getTeamsOfBuild/' + rnb).success( function ( response )
                     {
+                        console.log("getTeamsOfBuild successful");
                         //console.log("TEAMS : " + response.values);
                         var teams = [];
                         teams = response.values;
@@ -66,19 +67,19 @@
       };
 
 
-      // This function is to populate the data for a particular release, build and team in Report2 format
+      // This function is to populate the data for a particular release, build and team in Report3 format
       var getPageData = function( release, build, team )
       {
         console.log("*** IN getPageData ***");
         var rbnt = release + ":" + build + ":" + team ;
         //console.log("rbnt : " + rbnt);
 
-        // This set is use to collect all the releases for selected rel, build and team. e.g. Tc1123, Tc1140 etc.
+        // This set is use to collect all the tcversions for selected rel, build and team. e.g. Tc1123, Tc1140 etc.
         var tcverSet = new Set();
 
         $http.get('/getResultsOfBuild/' + rbnt).success( function ( response )
         {
-            //console.log("+++++++++++++++++++++ getResultsOfBuild successful");
+            console.log("+++++++++++++++++++++ getResultsOfBuild successful");
             //console.log("response : " + response);
             //console.log("response length : " + response.values.length);
 
@@ -129,25 +130,31 @@
                     //console.log("--------------------------------------------------");
                     //console.log("teamwiseKeyObj : " + teamwiseKeyObj);
                     
+                    // Add tcversion to tcverionset
                     tcverSet.add(myTcversion);
 
                     var errorstep = resultDetails.errorstep;
                     myTcArray = myArray[errorstep];
+                    // if myTcArray not present for errorstep. create one.
                     if(!myTcArray)
                     {
                         var myTcArray = new Object();
+                        // initialize count to 0.
                         myTcArray[myTcversion] = 0;
                     }
                     else
                     {
+                        // if myTcArray present for errorstep, then check if count for tcversion exists in myTcArray
                         var keys = Object.keys(myTcArray);
                         var found = findObjInArray(keys, myTcversion);
+                        // if tcversion is not found in myTcArray then initialize array count for tcversion to 0.
                         if(!found)
                         {
                             myTcArray[myTcversion] = 0;
                         }
                     }
 
+                    // if result is failed then get the count for tcversion from myTcArray. increment by one. again store myTcArray in myArray[errorstep]
                     if(resultDetails.result==='failed')
                     {
                         //console.log("myTcArray is null : failed");
@@ -160,6 +167,7 @@
                 }
             }
 
+            //store report3 for this release + build + team in session object.
             $window.sessionStorage.setItem(rbnt+"Report3",JSON.stringify(myArray));
             var tcVersionArray = Array.from(tcverSet);
             tcVersionArray.sort();
